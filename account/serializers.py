@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserModel, CountyModel, RegionModel
+from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
 from config.validators import PhoneValidator
 
 
@@ -63,4 +63,20 @@ class UserSerializer(serializers.ModelSerializer):
             'avatar': {'required': False},
             'language': {'required': False},
             'theme_mode': {'required': False},
+        }
+
+
+class DeliverAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DeliveryAddress
+        fields = ['id', 'name', 'full_address', 'apartment_office', 'floor', 'door_or_phone', 'instructions']
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'name': {'required': False},
+            'full_address': {'required': False},
+            'apartment_office': {'required': False},
+            'floor': {'required': False},
+            'door_or_phone': {'required': False},
+            'instructions': {'required': False},
         }

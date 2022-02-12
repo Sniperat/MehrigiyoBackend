@@ -2,15 +2,14 @@ from django.shortcuts import render, redirect
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import UserModel, CountyModel, RegionModel
+from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
 from shop.models import Medicine
 from consultation.models import Doctor
 from config.helpers import send_sms_code, validate_sms_code
 from config.validators import PhoneValidator
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
-                          RegionSerializer, CountrySerializer, UserSerializer)
-
+                          RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer)
 
 
 class SendSmsView(APIView):
@@ -152,3 +151,25 @@ class DoctorView(APIView):
         user.favorite_doctor.remove(doc)
         user.save()
         return ResponseSuccess()
+
+
+class DeliverAddressView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        address = DeliveryAddress.objects.filter(user=request.user)
+        serializers = DeliverAddressSerializer(address, many=True)
+        return ResponseSuccess(data=serializers.data)
+
+    def post(self, request):
+        serializers = DeliverAddressSerializer(data=request.data)
+
+        if serializers.is_valid():
+            da = DeliveryAddress(**serializers.data)
+            da.user = request.user
+            da.save()
+            return ResponseSuccess(data=serializers.data)
+        else:
+            return ResponseFail(data=serializers.errors)
+
+
