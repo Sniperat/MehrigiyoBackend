@@ -27,6 +27,8 @@ urlpatterns = i18n_patterns(
         path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
         path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
         path('user/', include('account.urls')),
+        path('shop/', include('shop.urls')),
+        path('news/', include('news.urls')),
     ]))
 
 )

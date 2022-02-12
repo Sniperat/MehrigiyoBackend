@@ -15,45 +15,45 @@ from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSeria
 class SendSmsView(APIView):
     def get(self, request):
         serializer = SmsSerializer()
-        return Response(data=serializer.data)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
         serializer = SmsSerializer(data=request.data)
         if serializer.is_valid():
             send_sms_code(request, serializer.data['phone'])
-            return ResponseSuccess()
-        return ResponseFail(data=serializer.errors)
+            return ResponseSuccess(request=request.method)
+        return ResponseFail(data=serializer.errors, request=request.method)
 
 
 class ConfirmSmsView(APIView):
 
     def get(self, request):
         serializer = ConfirmSmsSerializer()
-        return Response(data=serializer.data)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
         serializer = ConfirmSmsSerializer(data=request.data)
         if serializer.is_valid():
             if validate_sms_code(serializer.data['phone'], serializer.data['code']):
-                return ResponseSuccess(data="Telefon nomer tasdiqladi")
+                return ResponseSuccess(data="Telefon nomer tasdiqladi", request=request.method)
             else:
-                return ResponseFail(data='Code hato kiritilgan')
-        return ResponseFail(data=serializer.errors)
+                return ResponseFail(data='Code hato kiritilgan', request=request.method)
+        return ResponseFail(data=serializer.errors, request=request.method)
 
 
 class RegistrationView(APIView):
 
     def get(self, request):
         serializer = RegistrationSerializer()
-        return Response(data=serializer.data)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return ResponseSuccess(data=serializer.data)
+            return ResponseSuccess(data=serializer.data, request=request.method)
         else:
-            return ResponseFail(data=serializer.errors)
+            return ResponseFail(data=serializer.errors, request=request.method)
 
 
 class UserView(APIView):
@@ -61,15 +61,15 @@ class UserView(APIView):
 
     def get(self, request):
         serializer = UserSerializer(request.user)
-        return ResponseSuccess(data=serializer.data)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
     def put(self, request):
         serializer = UserSerializer(request.user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return ResponseSuccess(data=serializer.data)
+            return ResponseSuccess(data=serializer.data, request=request.method)
         else:
-            return ResponseFail(data=serializer.errors)
+            return ResponseFail(data=serializer.errors, request=request.method)
 
 
 class RegionView(APIView):
@@ -78,7 +78,7 @@ class RegionView(APIView):
     def get(self, request):
         reg = RegionModel.objects.all()
         serializer = RegionSerializer(reg, many=True)
-        return Response(data=serializer.data)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
 
 class CountryView(APIView):
@@ -87,7 +87,7 @@ class CountryView(APIView):
     def get(self, request):
         coun = CountyModel.objects.all()
         serializer = CountrySerializer(coun, many=True)
-        return Response(data=serializer.data)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
 
 class AddAddressView(APIView):
@@ -97,12 +97,12 @@ class AddAddressView(APIView):
         try:
             id = request.data['region_id']
         except:
-            return ResponseFail(data='Bunday Viloyat mavjud emas')
+            return ResponseFail(data='Bunday Viloyat mavjud emas', request=request.method)
         region = RegionModel.objects.get(id=id)
         user = request.user
         user.address = region
         user.save()
-        return ResponseSuccess()
+        return ResponseSuccess(request=request.method)
 
 
 class MedicineView(APIView):
@@ -112,21 +112,21 @@ class MedicineView(APIView):
         try:
             med = Medicine.objects.get(id=pk)
         except:
-            return ResponseFail(data='Bunday dori mavjud emas')
+            return ResponseFail(data='Bunday dori mavjud emas', request=request.method)
         user = request.user
         user.favorite_medicine.add(med)
         user.save()
-        return ResponseSuccess()
+        return ResponseSuccess(request=request.method)
 
     def delete(self, request, pk):
         try:
             med = Medicine.objects.get(id=pk)
         except:
-            return ResponseFail(data='Bunday dori mavjud emas')
+            return ResponseFail(data='Bunday dori mavjud emas', request=request.method)
         user = request.user
         user.favorite_medicine.remove(med)
         user.save()
-        return ResponseSuccess()
+        return ResponseSuccess(request=request.method)
 
 
 class DoctorView(APIView):
@@ -136,21 +136,21 @@ class DoctorView(APIView):
         try:
             doc = Doctor.objects.get(id=pk)
         except:
-            return ResponseFail(data='Bunday doktr mavjud emas')
+            return ResponseFail(data='Bunday doktr mavjud emas', request=request.method)
         user = request.user
         user.favorite_doctor.add(doc)
         user.save()
-        return ResponseSuccess()
+        return ResponseSuccess(request=request.method)
 
     def delete(self, request, pk):
         try:
             doc = Doctor.objects.get(id=pk)
         except:
-            return ResponseFail(data='Bunday doktor mavjud emas')
+            return ResponseFail(data='Bunday doktor mavjud emas', request=request.method)
         user = request.user
         user.favorite_doctor.remove(doc)
         user.save()
-        return ResponseSuccess()
+        return ResponseSuccess(request=request.method)
 
 
 class DeliverAddressView(APIView):
@@ -159,7 +159,7 @@ class DeliverAddressView(APIView):
     def get(self, request):
         address = DeliveryAddress.objects.filter(user=request.user)
         serializers = DeliverAddressSerializer(address, many=True)
-        return ResponseSuccess(data=serializers.data)
+        return ResponseSuccess(data=serializers.data, request=request.method)
 
     def post(self, request):
         serializers = DeliverAddressSerializer(data=request.data)
@@ -168,8 +168,8 @@ class DeliverAddressView(APIView):
             da = DeliveryAddress(**serializers.data)
             da.user = request.user
             da.save()
-            return ResponseSuccess(data=serializers.data)
+            return ResponseSuccess(data=serializers.data, request=request.method)
         else:
-            return ResponseFail(data=serializers.errors)
+            return ResponseFail(data=serializers.errors, request=request.method)
 
 

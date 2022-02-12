@@ -71,7 +71,7 @@ class UserModel(AbstractUser):
         verbose_name_plural = "users"
 
     def __str__(self):
-        return self.get_full_name()
+        return self.username
 
 
 # Sms kode
@@ -95,10 +95,16 @@ class SmsAttempt(models.Model):
 class CountyModel(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class RegionModel(models.Model):
     country = models.ForeignKey(CountyModel, on_delete=models.RESTRICT)
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class DeliveryAddress(models.Model):
@@ -109,3 +115,6 @@ class DeliveryAddress(models.Model):
     floor = models.CharField(max_length=255, null=True, blank=True)
     door_or_phone = models.CharField(max_length=255, null=True, blank=True)
     instructions = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.name

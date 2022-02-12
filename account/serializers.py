@@ -15,7 +15,7 @@ class ConfirmSmsSerializer(serializers.Serializer):
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'avatar']
+        fields = ['username', 'first_name', 'last_name', 'password', 'email', 'avatar']
         extra_kwargs = {
             'password': {'write_only': True},
             'avatar': {'required': False},
