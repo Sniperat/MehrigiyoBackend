@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import MedicineView, TypeMedicineView, GetMedicineWithType
+from .views import MedicinesView, TypeMedicineView, GetMedicinesWithType, GetSingleMedicine
 
 urlpatterns = [
     path('types/', TypeMedicineView.as_view()),
-    path('medicines/', MedicineView.as_view()),
-    path('medicines/<int:pk>/', GetMedicineWithType.as_view()),
+    path('types/<int:pk>/', GetMedicinesWithType.as_view()),
+    path('medicines/', MedicinesView.as_view()),
+    path('medicines/<int:pk>/', GetSingleMedicine.as_view()),
 ]

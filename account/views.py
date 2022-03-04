@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
 from shop.models import Medicine
-from consultation.models import Doctor
+from specialist.models import Doctor
 from config.helpers import send_sms_code, validate_sms_code
 from config.validators import PhoneValidator
 from config.responses import ResponseFail, ResponseSuccess

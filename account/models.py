@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from config.validators import PhoneValidator
 from shop.models import Medicine
-from consultation.models import Doctor
+from specialist.models import Doctor
 import datetime
 # from django.utils.translation import gettext as _
 
@@ -51,7 +51,7 @@ class UserModel(AbstractUser):
     address = models.ForeignKey('RegionModel', on_delete=models.RESTRICT, null=True, blank=True)
     language = models.CharField(max_length=3, null=True, blank=True)
     favorite_medicine = models.ManyToManyField(Medicine, blank=True)
-    favorite_doctor = models.ManyToManyField(Doctor, blank=True)
+    favorite_doctor = models.ManyToManyField(Doctor, blank=True, related_name='doktr')
 
     WHITE = 1
     BLACK = 2
@@ -64,6 +64,8 @@ class UserModel(AbstractUser):
         (WHITE, 'White')
     ), default=1, db_index=True)
 
+    specialist_doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT,
+                                          null=True, blank=True, related_name='worker')
     username_validator = PhoneValidator()
 
     class Meta:

@@ -19,7 +19,7 @@ class TypeMedicine(models.Model):
 
 
 class Medicine(models.Model):
-    image = models.ImageField(upload_to=f'medicine /', null=True, blank=True)
+    image = models.ImageField(upload_to=f'medicine/', null=True, blank=True)
     pictures = models.ManyToManyField(PicturesMedicine, blank=True)
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
@@ -29,6 +29,7 @@ class Medicine(models.Model):
     review = models.IntegerField(default=0)
     type_medicine = models.ForeignKey(TypeMedicine, on_delete=models.RESTRICT, null=True)
     cost = models.IntegerField(null=True)
+    discount = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):

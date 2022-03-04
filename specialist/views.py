@@ -3,43 +3,42 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import TypeMedicineSerializer, MedicineSerializer
-from .models import PicturesMedicine, TypeMedicine, Medicine
+from .serializers import TypeDoctorSerializer, DoctorSerializer
+from .models import Doctor, TypeDoctor
 
 
-class TypeMedicineView(APIView):
+class TypeDoctorView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        types = TypeMedicine.objects.all()
-        serializer = TypeMedicineSerializer(types, many=True)
+        types = TypeDoctor.objects.all()
+        serializer = TypeDoctorSerializer(types, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class MedicinesView(APIView):
+class DoctorsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        medicine = Medicine.objects.all()
-        serializer = MedicineSerializer(medicine, many=True)
+        medicine = Doctor.objects.all()
+        serializer = DoctorSerializer(medicine, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class GetMedicinesWithType(APIView):
+class GetDoctorsWithType(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
-        medicine = Medicine.objects.filter(type_medicine_id=pk)
-        serializer = MedicineSerializer(medicine, many=True)
+        medicine = Doctor.objects.filter(type_doctor_id=pk)
+        serializer = DoctorSerializer(medicine, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class GetSingleMedicine(APIView):
+class GetSingleDoctor(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
-        medicine = Medicine.objects.get(id=pk)
-        serializer = MedicineSerializer(medicine)
+        doc = Doctor.objects.get(id=pk)
+        serializer = DoctorSerializer(doc)
         return ResponseSuccess(data=serializer.data, request=request.method)
-
 

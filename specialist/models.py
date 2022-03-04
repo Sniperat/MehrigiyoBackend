@@ -1,0 +1,22 @@
+from django.db import models
+
+
+class TypeDoctor(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to=f'types/', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Doctor(models.Model):
+    image = models.ImageField(upload_to=f'doctor/', null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True)
+    review = models.IntegerField(default=0)
+    experience = models.CharField(max_length=50, null=True)
+    description = models.TextField(null=True)
+    type_doctor = models.ForeignKey(TypeDoctor, on_delete=models.RESTRICT, null=True)
+    created_at = models.DateTimeField(auto_now=True, null=True)
+
+
+

@@ -11,15 +11,17 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'is_staff', 'is_active',)
     list_filter = ('username', 'is_staff', 'is_active',)
     fieldsets = (
-        (None, {'fields': ('username', 'first_name', 'last_name', 'email', 'avatar', 'address', 'language',
-                'favorite_medicine', 'favorite_doctor', 'theme_mode')}),
+        (None, {'fields': ('username', 'password', 'first_name', 'last_name', 'email', 'avatar', 'address', 'language',
+                'favorite_medicine', 'favorite_doctor', 'theme_mode', 'specialist_doctor')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')}
-        ),
+            'fields': ('username', 'first_name', 'last_name', 'password1', 'password2',
+                       'is_staff',
+                       'is_active')}
+         ),
     )
     search_fields = ('username',)
     ordering = ('username',)

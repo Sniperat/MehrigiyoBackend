@@ -15,7 +15,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('auth', '0012_alter_user_first_name_max_length'),
         ('shop', '0001_initial'),
-        ('consultation', '0001_initial'),
     ]
 
     operations = [
@@ -103,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usermodel',
             name='favorite_doctor',
-            field=models.ManyToManyField(blank=True, to='consultation.Doctor'),
+            field=models.ManyToManyField(blank=True, to='specialist.Doctor'),
         ),
         migrations.AddField(
             model_name='usermodel',

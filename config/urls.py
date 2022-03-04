@@ -20,16 +20,22 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 
-
-urlpatterns = i18n_patterns(
+urlpatterns = [
     path('admin/', admin.site.urls),
+    path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include([
-        path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
-        path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-        path('user/', include('account.urls')),
-        path('shop/', include('shop.urls')),
-        path('news/', include('news.urls')),
+            path('user/', include('account.urls')),
+            path('shop/', include('shop.urls')),
+            path('news/', include('news.urls')),
+            path('comment/', include('comment.urls')),
+            path('specialist/', include('specialist.urls')),
+            path('chat/', include('chat.urls'))
     ]))
+]
+urlpatterns += i18n_patterns(
+
+
 
 )
 
