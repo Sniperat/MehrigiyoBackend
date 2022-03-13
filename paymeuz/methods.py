@@ -13,7 +13,7 @@ def create_cards(card_number, expire, save=False) -> dict:
             save=save
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION)
     result = response.json()
     if 'error' in result:
         return result
@@ -28,7 +28,7 @@ def cards_get_verify_code(token) -> dict:
         method=CARDS_GET_VERIFY_CODE,
         params=dict(token=token)
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION)
     result = response.json()
     # result.update(token=token)
 
@@ -43,7 +43,7 @@ def cards_verify(code, token):
             code=code
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION)
     return response.json()
 
 
@@ -54,7 +54,7 @@ def cards_check(token):
             token=token,
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION)
     return response.json()
 
 
@@ -65,7 +65,7 @@ def cards_remove(token):
             token=token,
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION)
     return response.json()
 
 
@@ -80,7 +80,7 @@ def create_transaction(order_id, amount, order_type=None) -> dict:
             }
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
     result = response.json()
 
     return result
@@ -96,7 +96,7 @@ def pay_transaction(pk, token) -> dict:
         )# 900513533 abduhamid
     )
     print(data)
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
     result = response.json()
     return result
 
@@ -110,7 +110,7 @@ def send_transaction(pk, phone) -> dict:
             phone=phone
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
     result = response.json()
 
     return result
@@ -124,7 +124,7 @@ def get_transaction(pk) -> dict:
             id=pk,
         )
     )
-    response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
+    response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION_TRANSACTION)
     result = response.json()
 
     return result
@@ -144,7 +144,7 @@ class Paymeuz:
             )
         )
         response = requests.post(
-            url=TEST_URL,
+            url=PRODUCTION_URL,
             json=data,
             headers=AUTHORIZATION
         )
@@ -162,7 +162,7 @@ class Paymeuz:
             )
         )
 
-        response = requests.post(url=TEST_URL, json=data, headers=AUTHORIZATION)
+        response = requests.post(url=PRODUCTION_URL, json=data, headers=AUTHORIZATION)
         print('asd')
         return response.json()
 
