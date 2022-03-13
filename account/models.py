@@ -45,7 +45,7 @@ class UserModel(AbstractUser):
     objects = UserManager()
     username = models.CharField(max_length=15, unique=True,
                                 validators=[PhoneValidator()], help_text="Пожалуйста, укажите свой пароль")
-    password = models.CharField(max_length=12, null=True, blank=True)
+    password = models.CharField(max_length=256, null=True, blank=True)
     email = models.EmailField(validators=[EmailValidator()], null=True, blank=True)
     avatar = models.ImageField(upload_to=f'avatars/{today.year}-{today.month}-{today.month}/', null=True, blank=True)
     address = models.ForeignKey('RegionModel', on_delete=models.RESTRICT, null=True, blank=True)
