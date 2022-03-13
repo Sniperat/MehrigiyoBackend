@@ -11,6 +11,7 @@ class Message(models.Model):
                               null=True, blank=True)
     file = models.FileField(upload_to=f'message/files/{today.year}-{today.month}-{today.month}/',
                             null=True, blank=True)
+    video = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

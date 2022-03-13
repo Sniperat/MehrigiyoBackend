@@ -19,4 +19,24 @@ class Doctor(models.Model):
     created_at = models.DateTimeField(auto_now=True, null=True)
 
 
+FEEDBACK = (
+    (1, 'Not Bad'),
+    (2, 'Love it'),
+    (3, 'Nice Work'),
+    (4, 'Awesome'),
+)
+
+
+class RateDoctor(models.Model):
+    client = models.ForeignKey('account.UserModel', on_delete=models.RESTRICT)
+    doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT)
+    rate = models.SmallIntegerField(default=4, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+    feedback = models.SmallIntegerField(default=1, choices=FEEDBACK)
+    created_at = models.DateTimeField(auto_now=True, null=True)
+
+
+class AdviceTime(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT)
+    client = models.ForeignKey('account.UserModel', on_delete=models.RESTRICT)
+    start_time = models.DateTimeField()
 

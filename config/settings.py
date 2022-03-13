@@ -12,7 +12,15 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import environ
+import os
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ui1d-k7ojs(_etnx33=4jt0y_v@4w2ejv*cxa(mkc4$&_hr4sf'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -43,7 +51,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'drf_yasg',
+
     'corsheaders',
+
+    'paymeuz',
 
     'account',
     'shop',
@@ -101,13 +113,15 @@ ASGI_APPLICATION = 'config.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+try:
+    DATABASES = {'default': env.db(), }
+except:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 
 # Password validation
@@ -132,6 +146,7 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.schemas.coreapi.AutoSchema',
     ],
 }
 
@@ -146,11 +161,11 @@ CHANNEL_LAYERS = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(weeks=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(weeks=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': True,
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
 
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
@@ -189,6 +204,18 @@ LANGUAGES = [
     ('en', 'English'),
 ]
 
+PAYMEUZ_SETTINGS = {
+    'TEST_ENV': True,
+    'ID': env('PAYME_ID'),
+
+    'KEY': env('PAYME_KEY'),
+
+    'ACCOUNTS': {
+        'KEY_1': 'order_id',
+        'KEY_2': None
+    }
+}
+
 TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
@@ -211,6 +238,7 @@ AUTH_USER_MODEL = "account.UserModel"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DEFAULT_DELIVERY_COST = env('DEFAULT_DELIVERY_COST')
 
-SMS_USERNAME = "arknet"
-SMS_PASSWORD = "b5c73NXv7C"
+SMS_USERNAME = env('SMS_USERNAME')
+SMS_PASSWORD = env('SMS_PASSWORD')

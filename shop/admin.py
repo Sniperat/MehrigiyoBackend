@@ -1,6 +1,6 @@
 from django.contrib import admin
 from modeltranslation.admin import TabbedTranslationAdmin
-from .models import Medicine, TypeMedicine
+from .models import Medicine, TypeMedicine, OrderModel, CartModel, PicturesMedicine
 
 
 class TypeMedicineAdmin(TabbedTranslationAdmin):
@@ -13,5 +13,8 @@ class MedicineAdmin(TabbedTranslationAdmin):
 
 admin.site.register(Medicine, MedicineAdmin)
 admin.site.register(TypeMedicine, TypeMedicineAdmin)
+admin.site.register(OrderModel)
+admin.site.register(CartModel)
+admin.site.register(PicturesMedicine)
 
 # Register your models here.

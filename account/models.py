@@ -44,14 +44,14 @@ class UserManager(BaseUserManager):
 class UserModel(AbstractUser):
     objects = UserManager()
     username = models.CharField(max_length=15, unique=True,
-                                validators=[PhoneValidator()], help_text="Пожалуйста, укажите свой пароль")
+                                validators=[PhoneValidator], help_text="Пожалуйста, укажите свой пароль")
     password = models.CharField(max_length=12, null=True, blank=True)
     email = models.EmailField(validators=[EmailValidator()], null=True, blank=True)
     avatar = models.ImageField(upload_to=f'avatars/{today.year}-{today.month}-{today.month}/', null=True, blank=True)
     address = models.ForeignKey('RegionModel', on_delete=models.RESTRICT, null=True, blank=True)
     language = models.CharField(max_length=3, null=True, blank=True)
-    favorite_medicine = models.ManyToManyField(Medicine, blank=True)
-    favorite_doctor = models.ManyToManyField(Doctor, blank=True, related_name='doktr')
+    favorite_medicine = models.ManyToManyField(Medicine, blank=True, related_name='fav_med')
+    favorite_doctor = models.ManyToManyField(Doctor, blank=True, related_name='fav_dock')
 
     WHITE = 1
     BLACK = 2
@@ -104,6 +104,7 @@ class CountyModel(models.Model):
 class RegionModel(models.Model):
     country = models.ForeignKey(CountyModel, on_delete=models.RESTRICT)
     name = models.CharField(max_length=100)
+    delivery_price = models.IntegerField(default=0, null=True)
 
     def __str__(self):
         return self.name
@@ -112,6 +113,7 @@ class RegionModel(models.Model):
 class DeliveryAddress(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.RESTRICT)
     name = models.CharField(max_length=255, null=True, blank=True)
+    region = models.ForeignKey(RegionModel, on_delete=models.RESTRICT, null=True)
     full_address = models.CharField(max_length=255, null=True, blank=True)
     apartment_office = models.CharField(max_length=255, null=True, blank=True)
     floor = models.CharField(max_length=255, null=True, blank=True)

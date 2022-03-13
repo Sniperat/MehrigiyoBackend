@@ -1,12 +1,11 @@
-from django.shortcuts import render, redirect
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
 from shop.models import Medicine
+from shop.serializers import MedicineSerializer
 from specialist.models import Doctor
+from specialist.serializers import DoctorSerializer
 from config.helpers import send_sms_code, validate_sms_code
-from config.validators import PhoneValidator
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
                           RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer)
@@ -57,6 +56,8 @@ class RegistrationView(APIView):
 
 
 class UserView(APIView):
+    queryset = UserModel.objects.all()
+    serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -75,8 +76,8 @@ class UserView(APIView):
 class RegionView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
-        reg = RegionModel.objects.all()
+    def get(self, request, pk):
+        reg = RegionModel.objects.filter(country_id=pk)
         serializer = RegionSerializer(reg, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
@@ -93,12 +94,11 @@ class CountryView(APIView):
 class AddAddressView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def post(self, request, pk):
         try:
-            id = request.data['region_id']
+            region = RegionModel.objects.get(id=pk)
         except:
             return ResponseFail(data='Bunday Viloyat mavjud emas', request=request.method)
-        region = RegionModel.objects.get(id=id)
         user = request.user
         user.address = region
         user.save()
@@ -107,6 +107,12 @@ class AddAddressView(APIView):
 
 class MedicineView(APIView):
     permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = request.user
+        list_medicine = user.favorite_medicine.all()
+        serializer = MedicineSerializer(list_medicine, many=True)
+        return ResponseSuccess(data=serializer.data)
 
     def post(self, request, pk):
         try:
@@ -131,6 +137,12 @@ class MedicineView(APIView):
 
 class DoctorView(APIView):
     permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = request.user
+        list_doctor = user.favorite_doctor.all()
+        serializer = DoctorSerializer(list_doctor, many=True)
+        return ResponseSuccess(data=serializer.data)
 
     def post(self, request, pk):
         try:
@@ -162,14 +174,16 @@ class DeliverAddressView(APIView):
         return ResponseSuccess(data=serializers.data, request=request.method)
 
     def post(self, request):
+        region = RegionModel.objects.get(id=request.data["region"])
         serializers = DeliverAddressSerializer(data=request.data)
-
+        del request.data["region"]
         if serializers.is_valid():
             da = DeliveryAddress(**serializers.data)
             da.user = request.user
+            da.region = region
             da.save()
+            serializers = DeliverAddressSerializer(da)
             return ResponseSuccess(data=serializers.data, request=request.method)
         else:
             return ResponseFail(data=serializers.errors, request=request.method)
-
 

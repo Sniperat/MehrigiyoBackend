@@ -18,12 +18,13 @@ class CommentDoctorView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request, pk):
-        doctor = Doctor.objects.get(doctor_id=pk)
+        doctor = Doctor.objects.get(id=pk)
         serializer = CommentDoctorSerializer(data=request.data)
         if serializer.is_valid():
-            comment = CommentDoctor(**serializer.data)
+            comment = CommentDoctor()
+            comment.text = request.data['text']
             comment.user = request.user
-            comment.medicine = doctor
+            comment.doctor = doctor
             comment.save()
             s = CommentDoctorSerializer(comment)
             return ResponseSuccess(data=s.data, request=request.method)
@@ -39,7 +40,7 @@ class CommentMedicineView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request, pk):
-        medicine = Medicine.objects.get(medicine_id=pk)
+        medicine = Medicine.objects.get(id=pk)
         serializer = CommentMedicineSerializer(data=request.data)
         if serializer.is_valid():
             comment = CommentMedicine(**serializer.data)

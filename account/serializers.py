@@ -38,7 +38,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class RegionSerializer(serializers.ModelSerializer):
-    country = CountrySerializer()
+    # country = CountrySerializer()
 
     class Meta:
         model = RegionModel
@@ -70,13 +70,16 @@ class DeliverAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeliveryAddress
-        fields = ['id', 'name', 'full_address', 'apartment_office', 'floor', 'door_or_phone', 'instructions']
+        fields = ['id', 'name', 'region', 'full_address', 'apartment_office', 'floor', 'door_or_phone', 'instructions']
         extra_kwargs = {
             'id': {'read_only': True},
             'name': {'required': False},
+            'region': {'required': False},
             'full_address': {'required': False},
             'apartment_office': {'required': False},
             'floor': {'required': False},
             'door_or_phone': {'required': False},
             'instructions': {'required': False},
         }
+
+
