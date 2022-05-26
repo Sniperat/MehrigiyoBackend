@@ -11,7 +11,7 @@ from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderMo
 
 
 class TypeMedicineView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         types = TypeMedicine.objects.all()
@@ -20,7 +20,7 @@ class TypeMedicineView(APIView):
 
 
 class MedicinesView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         medicine = Medicine.objects.all()
@@ -29,7 +29,7 @@ class MedicinesView(APIView):
 
 
 class GetMedicinesWithType(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         id_list = list(request.data['list'].split(','))
@@ -39,7 +39,7 @@ class GetMedicinesWithType(APIView):
 
 
 class GetSingleMedicine(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
         medicine = Medicine.objects.get(id=pk)
@@ -122,7 +122,7 @@ class OrderView(APIView):
         del request.data['id']
         serializer = OrderCreateSerializer(order, data=request.data)
         if serializer.is_valid():
-            if add_key == 1 :
+            if add_key == 1:
                 if order.shipping_address is None:
                     if da.region.delivery_price == 0:
                         order.price = order.price + settings.DEFAULT_DELIVERY_COST

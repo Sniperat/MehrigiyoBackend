@@ -13,7 +13,7 @@ utc = pytz.UTC
 
 
 class TypeDoctorView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         types = TypeDoctor.objects.all()
@@ -22,7 +22,7 @@ class TypeDoctorView(APIView):
 
 
 class DoctorsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         medicine = Doctor.objects.all()
@@ -31,7 +31,7 @@ class DoctorsView(APIView):
 
 
 class GetDoctorsWithType(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
         medicine = Doctor.objects.filter(type_doctor_id=pk)
@@ -40,7 +40,7 @@ class GetDoctorsWithType(APIView):
 
 
 class GetSingleDoctor(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
         doc = Doctor.objects.get(id=pk)
