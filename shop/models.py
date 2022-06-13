@@ -14,6 +14,7 @@ class PicturesMedicine(models.Model):
 class TypeMedicine(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to=f'types/', null=True, blank=True)
+    icon = models.ImageField(upload_to=f'types/icons/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -28,6 +29,7 @@ class Medicine(models.Model):
     description = models.TextField(null=True)
     quantity = models.IntegerField(default=0)
     review = models.IntegerField(default=0)
+    weight = models.FloatField(default=0)
     type_medicine = models.ForeignKey(TypeMedicine, on_delete=models.RESTRICT, null=True)
     cost = models.IntegerField(null=True)
     discount = models.IntegerField(default=0)
@@ -94,3 +96,11 @@ class OrderModel(models.Model):
 
     def get_payme_amount(self):
         return self.price*100
+
+
+class Advertising(models.Model):
+    image = models.ImageField(upload_to=f'medicine/advertising/', null=True, blank=True)
+    title = models.CharField(max_length=255)
+    text = models.TextField()
+    medicine = models.ForeignKey(Medicine, on_delete=models.RESTRICT, null=True, blank=True)
+

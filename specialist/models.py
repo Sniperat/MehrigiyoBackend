@@ -40,3 +40,9 @@ class AdviceTime(models.Model):
     client = models.ForeignKey('account.UserModel', on_delete=models.RESTRICT)
     start_time = models.DateTimeField()
 
+
+class Advertising(models.Model):
+    image = models.ImageField(upload_to=f'doctor/advertising/', null=True, blank=True)
+    title = models.CharField(max_length=255)
+    text = models.TextField()
+    doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT, null=True, blank=True)

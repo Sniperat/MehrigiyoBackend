@@ -6,10 +6,19 @@ import datetime
 import pytz
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer
-from .models import Doctor, TypeDoctor, AdviceTime
+from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer, AdvertisingSerializer
+from .models import Doctor, TypeDoctor, AdviceTime, Advertising
 
 utc = pytz.UTC
+
+
+class AdvertisingView(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        types = Advertising.objects.all()
+        serializer = AdvertisingSerializer(types, many=True)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
 
 class TypeDoctorView(APIView):
@@ -25,8 +34,14 @@ class DoctorsView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        medicine = Doctor.objects.all()
-        serializer = DoctorSerializer(medicine, many=True)
+        doctors = Doctor.objects.all()
+        serializer = DoctorSerializer(doctors, many=True)
+        return ResponseSuccess(data=serializer.data, request=request.method)
+
+    def post(self, request):
+        key = request.data['key']
+        doctors = Doctor.objects.filter(full_name__contains=key)
+        serializer = DoctorSerializer(doctors, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
@@ -35,7 +50,9 @@ class GetDoctorsWithType(APIView):
 
     def get(self, request, pk):
         medicine = Doctor.objects.filter(type_doctor_id=pk)
+        count = len(medicine)
         serializer = DoctorSerializer(medicine, many=True)
+        serializer.data['count'] = count
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 

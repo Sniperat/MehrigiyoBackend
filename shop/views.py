@@ -2,12 +2,21 @@ from django.conf import settings
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
+from .filters import ProductFilter
 from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
 from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
-                          OrderShowSerializer)
-from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel
+                          OrderShowSerializer, AdvertisingSerializer)
+from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
+
+
+class AdvertisingView(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        types = Advertising.objects.all()
+        serializer = AdvertisingSerializer(types, many=True)
+        return ResponseSuccess(data=serializer.data, request=request.method)
 
 
 class TypeMedicineView(APIView):
@@ -23,7 +32,14 @@ class MedicinesView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        medicine = Medicine.objects.all()
+        # medicine = Medicine.objects.all()
+        filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
+        serializer = MedicineSerializer(filter, many=True)
+        return ResponseSuccess(data=serializer.data, request=request.method)
+
+    def post(self, request):
+        key = request.data['key']
+        medicine = Medicine.objects.filter(name__contains=key)
         serializer = MedicineSerializer(medicine, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
@@ -31,7 +47,7 @@ class MedicinesView(APIView):
 class GetMedicinesWithType(APIView):
     # permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def post(self, request):
         id_list = list(request.data['list'].split(','))
         medicine = Medicine.objects.filter(type_medicine_id__in=id_list)
         serializer = MedicineSerializer(medicine, many=True)

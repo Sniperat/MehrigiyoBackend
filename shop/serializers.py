@@ -1,7 +1,14 @@
 from rest_framework import serializers
-from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel
+from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
 from account.serializers import DeliverAddressSerializer
 from account.models import DeliveryAddress
+
+
+class AdvertisingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Advertising
+        fields = '__all__'
 
 
 class PicturesMedicineSerializer(serializers.ModelSerializer):

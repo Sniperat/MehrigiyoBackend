@@ -9,6 +9,7 @@ from config.helpers import send_sms_code, validate_sms_code
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
                           RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer)
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 
 class SendSmsView(APIView):
@@ -34,7 +35,7 @@ class ConfirmSmsView(APIView):
         serializer = ConfirmSmsSerializer(data=request.data)
         if serializer.is_valid():
             if validate_sms_code(serializer.data['phone'], serializer.data['code']):
-                return ResponseSuccess(data="Telefon nomer tasdiqladi", request=request.method)
+                return ResponseSuccess(data="Telefon nomer tasdiqlandi", request=request.method)
             else:
                 return ResponseFail(data='Code hato kiritilgan', request=request.method)
         return ResponseFail(data=serializer.errors, request=request.method)
@@ -42,15 +43,22 @@ class ConfirmSmsView(APIView):
 
 class RegistrationView(APIView):
 
-    def get(self, request):
-        serializer = RegistrationSerializer()
-        return ResponseSuccess(data=serializer.data, request=request.method)
+    # def get(self, request):
+    #     serializer = RegistrationSerializer()
+    #     return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return ResponseSuccess(data=serializer.data, request=request.method)
+            user = serializer.save()
+            access_token = AccessToken().for_user(user)
+            refresh_token = RefreshToken().for_user(user)
+
+            return ResponseSuccess(data={
+                "refresh": str(refresh_token),
+                "access": str(access_token),
+                **serializer.data
+            }, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
 
@@ -186,4 +194,3 @@ class DeliverAddressView(APIView):
             return ResponseSuccess(data=serializers.data, request=request.method)
         else:
             return ResponseFail(data=serializers.errors, request=request.method)
-

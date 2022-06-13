@@ -148,5 +148,3 @@ class AdviceTimeAdminViewSet(viewsets.ModelViewSet):
     queryset = AdviceTime.objects.all()
     serializer_class = AdviceTimeAdminSerializer
     permission_classes = [IsAuthenticated, ]
-
-
