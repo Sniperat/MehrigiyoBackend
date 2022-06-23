@@ -32,9 +32,13 @@ class MedicinesView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        # medicine = Medicine.objects.all()
-        filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
-        serializer = MedicineSerializer(filter, many=True)
+        try:
+            filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
+            serializer = MedicineSerializer(filter, many=True)
+        except:
+            medicine = Medicine.objects.all()
+            serializer = MedicineSerializer(medicine, many=True)
+
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
