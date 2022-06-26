@@ -28,16 +28,20 @@ class TypeMedicineView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
+class MedicinesFilterView(APIView):
+    def get(self, request):
+        filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
+        serializer = MedicineSerializer(filter, many=True)
+
+        return ResponseSuccess(data=serializer.data, request=request.method)
+
+
 class MedicinesView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        try:
-            filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
-            serializer = MedicineSerializer(filter, many=True)
-        except:
-            medicine = Medicine.objects.all()
-            serializer = MedicineSerializer(medicine, many=True)
+        medicine = Medicine.objects.all()
+        serializer = MedicineSerializer(medicine, many=True)
 
         return ResponseSuccess(data=serializer.data, request=request.method)
 

@@ -27,10 +27,15 @@ class TypeMedicineSerializer(serializers.ModelSerializer):
 
 class MedicineSerializer(serializers.ModelSerializer):
     pictures = PicturesMedicineSerializer(many=True)
+    image = serializers.SerializerMethodField('get_image_url')
 
     class Meta:
         model = Medicine
         fields = '__all__'
+
+    def get_image_url(self, obj):
+
+        return obj.image.url
 
 
 class CartSerializer(serializers.ModelSerializer):
