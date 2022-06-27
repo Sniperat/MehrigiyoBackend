@@ -10,10 +10,10 @@ class AdvertisingSerializer(serializers.ModelSerializer):
 
 
 class TypeDoctorSerializer(serializers.ModelSerializer):
-
+    # get_doctors_count = serializers.SerializerMethodField('')
     class Meta:
         model = TypeDoctor
-        fields = '__all__'
+        fields = ['name', 'image', 'get_doctors_count']
 
 
 class DoctorSerializer(serializers.ModelSerializer):

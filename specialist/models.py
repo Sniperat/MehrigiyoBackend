@@ -8,6 +8,10 @@ class TypeDoctor(models.Model):
     def __str__(self):
         return self.name
 
+    def get_doctors_count(self):
+        sum = Doctor.objects.filter(type_doctor=self)
+        return len(sum)
+
 
 class Doctor(models.Model):
     image = models.ImageField(upload_to=f'doctor/', null=True, blank=True)
