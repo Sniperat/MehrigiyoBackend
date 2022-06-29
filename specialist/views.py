@@ -8,6 +8,7 @@ import pytz
 from config.responses import ResponseSuccess, ResponseFail
 from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer, AdvertisingSerializer
 from .models import Doctor, TypeDoctor, AdviceTime, Advertising
+from .filters import DoctorFilter
 
 utc = pytz.UTC
 
@@ -27,6 +28,15 @@ class TypeDoctorView(APIView):
     def get(self, request):
         types = TypeDoctor.objects.all()
         serializer = TypeDoctorSerializer(types, many=True)
+        return ResponseSuccess(data=serializer.data, request=request.method)
+
+
+class DoctorFilterView(APIView):
+
+    def get(self, request):
+        filter = DoctorFilter(request.GET, queryset=Doctor.objects.all())
+        serializer = DoctorSerializer(filter, many=True)
+
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 

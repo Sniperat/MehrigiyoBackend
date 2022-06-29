@@ -29,6 +29,7 @@ class TypeMedicineView(APIView):
 
 
 class MedicinesFilterView(APIView):
+
     def get(self, request):
         filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
         serializer = MedicineSerializer(filter, many=True)

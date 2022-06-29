@@ -24,7 +24,7 @@ class TypeMedicineSerializer(serializers.ModelSerializer):
         model = TypeMedicine
         fields = '__all__'
 
-
+import socket
 class MedicineSerializer(serializers.ModelSerializer):
     pictures = PicturesMedicineSerializer(many=True)
     image = serializers.SerializerMethodField('get_image_url')
@@ -35,7 +35,7 @@ class MedicineSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
 
-        return obj.image.url
+        return f'{socket.gethostbyname(socket.gethostname())}{obj.image.url}'
 
 
 class CartSerializer(serializers.ModelSerializer):
