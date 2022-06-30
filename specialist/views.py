@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
@@ -31,28 +32,19 @@ class TypeDoctorView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class DoctorFilterView(APIView):
-
-    def get(self, request):
-        filter = DoctorFilter(request.GET, queryset=Doctor.objects.all())
-        serializer = DoctorSerializer(filter, many=True)
-
-        return ResponseSuccess(data=serializer.data, request=request.method)
-
-
-class DoctorsView(APIView):
+class DoctorsView(viewsets.ModelViewSet):
+    queryset = Doctor.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = DoctorSerializer
+    filterset_class = DoctorFilter
 
     def get(self, request):
-        doctors = Doctor.objects.all()
-        serializer = DoctorSerializer(doctors, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
 
-    def post(self, request):
-        key = request.data['key']
-        doctors = Doctor.objects.filter(full_name__contains=key)
-        serializer = DoctorSerializer(doctors, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        page = self.paginate_queryset(filtered_qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
 class GetDoctorsWithType(APIView):

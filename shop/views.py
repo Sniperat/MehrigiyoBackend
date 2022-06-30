@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.shortcuts import render
+from drf_yasg import openapi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .filters import ProductFilter
@@ -8,7 +9,8 @@ from config.responses import ResponseSuccess, ResponseFail
 from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
                           OrderShowSerializer, AdvertisingSerializer)
 from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
-
+from rest_framework import viewsets, generics
+from drf_yasg.utils import swagger_auto_schema
 
 class AdvertisingView(APIView):
     # permission_classes = (IsAuthenticated,)
@@ -28,29 +30,29 @@ class TypeMedicineView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class MedicinesFilterView(APIView):
-
-    def get(self, request):
-        filter = ProductFilter(request.GET, queryset=Medicine.objects.all())
-        serializer = MedicineSerializer(filter, many=True)
-
-        return ResponseSuccess(data=serializer.data, request=request.method)
-
-
-class MedicinesView(APIView):
+class MedicinesView(viewsets.ModelViewSet):
+    queryset = Medicine.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = MedicineSerializer
+    filterset_class = ProductFilter
 
+    # @swagger_auto_schema(manual_parameters=[
+    #     openapi.Parameter('key', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
+    # ])
     def get(self, request):
-        medicine = Medicine.objects.all()
-        serializer = MedicineSerializer(medicine, many=True)
+        # key = request.GET.get('key', False)
+        # queryset = self.queryset
 
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        # if key:
+        #     queryset = self.queryset.filter(name__contains=key)
+        # serializer = self.get_serializer(queryset, many=True)
+        filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
 
-    def post(self, request):
-        key = request.data['key']
-        medicine = Medicine.objects.filter(name__contains=key)
-        serializer = MedicineSerializer(medicine, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        page = self.paginate_queryset(filtered_qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+        # return ResponseSuccess(data=serializer.data, request=request.method)
 
 
 class GetMedicinesWithType(APIView):
