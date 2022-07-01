@@ -97,3 +97,5 @@ class OrderShowSerializer(serializers.ModelSerializer):
         instance.save()
 
 
+class ListSerializer(serializers.Serializer):
+    list = serializers.CharField()

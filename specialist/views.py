@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -23,13 +25,17 @@ class AdvertisingView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class TypeDoctorView(APIView):
+class TypeDoctorView(viewsets.ModelViewSet):
+    queryset = TypeDoctor.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = TypeDoctorSerializer
 
     def get(self, request):
-        types = TypeDoctor.objects.all()
-        serializer = TypeDoctorSerializer(types, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+
+        page = self.paginate_queryset(self.queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
 class DoctorsView(viewsets.ModelViewSet):
@@ -47,24 +53,43 @@ class DoctorsView(viewsets.ModelViewSet):
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
-class GetDoctorsWithType(APIView):
+class GetDoctorsWithType(viewsets.ModelViewSet):
+    queryset = Doctor.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = DoctorSerializer
 
-    def get(self, request, pk):
-        medicine = Doctor.objects.filter(type_doctor_id=pk)
-        count = len(medicine)
-        serializer = DoctorSerializer(medicine, many=True)
-        serializer.data['count'] = count
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
+    ])
+    def get(self, request):
+        key = request.GET.get('pk', False)
+        queryset = self.queryset
+
+        if key:
+            queryset = self.queryset.filter(name__contains=key)
+        serializer = self.get_serializer(queryset, many=True)
+
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class GetSingleDoctor(APIView):
+class GetSingleDoctor(viewsets.ModelViewSet):
+    queryset = Doctor.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = DoctorSerializer
 
-    def get(self, request, pk):
-        doc = Doctor.objects.get(id=pk)
-        doc.review = doc.review + 1
-        serializer = DoctorSerializer(doc)
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
+    ])
+    def get(self, request):
+        key = request.GET.get('pk', False)
+        queryset = self.queryset
+
+        if key:
+            queryset = Doctor.objects.get(id=key)
+            queryset.review = queryset.review + 1
+            queryset.save()
+        serializer = self.get_serializer(queryset)
+
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 

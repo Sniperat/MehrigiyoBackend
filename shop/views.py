@@ -1,13 +1,14 @@
 from django.conf import settings
 from django.shortcuts import render
 from drf_yasg import openapi
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .filters import ProductFilter
 from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
 from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
-                          OrderShowSerializer, AdvertisingSerializer)
+                          OrderShowSerializer, AdvertisingSerializer, ListSerializer)
 from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
 from rest_framework import viewsets, generics
 from drf_yasg.utils import swagger_auto_schema
@@ -21,13 +22,16 @@ class AdvertisingView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class TypeMedicineView(APIView):
+class TypeMedicineView(viewsets.ModelViewSet):
+    queryset = TypeMedicine.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = TypeMedicineSerializer
 
     def get(self, request):
-        types = TypeMedicine.objects.all()
-        serializer = TypeMedicineSerializer(types, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        page = self.paginate_queryset(self.queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
 class MedicinesView(viewsets.ModelViewSet):
@@ -55,14 +59,19 @@ class MedicinesView(viewsets.ModelViewSet):
         # return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class GetMedicinesWithType(APIView):
+class GetMedicinesWithType(viewsets.ModelViewSet):
+    queryset = Medicine.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = MedicineSerializer
 
-    def post(self, request):
+    @action(detail=True, methods=['post'])
+    def get_with_types(self, request, *args, **kwargs):
         id_list = list(request.data['list'].split(','))
         medicine = Medicine.objects.filter(type_medicine_id__in=id_list)
-        serializer = MedicineSerializer(medicine, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        page = self.paginate_queryset(medicine)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
 class GetSingleMedicine(APIView):
