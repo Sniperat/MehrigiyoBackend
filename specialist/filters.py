@@ -6,4 +6,4 @@ class DoctorFilter(django_filters.FilterSet):
 
     class Meta:
         model = Doctor
-        fields = ['full_name', 'experience', 'description']
+        fields = ['id', 'full_name', 'experience', 'description']

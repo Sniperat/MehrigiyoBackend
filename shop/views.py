@@ -33,8 +33,9 @@ class TypeMedicineView(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
-
-class MedicinesView(viewsets.ModelViewSet):
+from rest_framework.mixins import ListModelMixin
+from rest_framework.viewsets import GenericViewSet
+class MedicinesView(ListModelMixin, GenericViewSet):
     queryset = Medicine.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = MedicineSerializer
@@ -51,6 +52,7 @@ class MedicinesView(viewsets.ModelViewSet):
         #     queryset = self.queryset.filter(name__contains=key)
         # serializer = self.get_serializer(queryset, many=True)
         filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
+        print(filtered_qs)
 
         page = self.paginate_queryset(filtered_qs)
         if page is not None:
@@ -74,13 +76,24 @@ class GetMedicinesWithType(viewsets.ModelViewSet):
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
-class GetSingleMedicine(APIView):
+class GetSingleMedicine(viewsets.ModelViewSet):
+    queryset = Medicine.objects.all()
+    serializer_class = MedicineSerializer
     # permission_classes = (IsAuthenticated,)
 
-    def get(self, request, pk):
-        medicine = Medicine.objects.get(id=pk)
-        serializer = MedicineSerializer(medicine)
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request):
+
+        key = request.GET.get('pk', False)
+        queryset = self.queryset
+
+        if key:
+            queryset = self.queryset.filter(name__contains=key)
+        serializer = self.get_serializer(queryset)
         return ResponseSuccess(data=serializer.data, request=request.method)
+
 
 
 class CartView(APIView):

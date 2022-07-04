@@ -2,6 +2,7 @@ from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
@@ -60,7 +61,9 @@ class GetDoctorsWithType(viewsets.ModelViewSet):
 
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
-    ])
+    ], operation_description='GET /articles/today/')
+    @action(detail=False, methods=['get'])
+    # @action(methods=['GET'], url_path='types/one/', url_name='asd', detail=True)
     def get(self, request):
         key = request.GET.get('pk', False)
         queryset = self.queryset
