@@ -58,7 +58,7 @@ class MedicinesView(ListModelMixin, GenericViewSet):
         #     queryset = self.queryset.filter(name__contains=key)
         # serializer = self.get_serializer(queryset, many=True)
         queryset = self.queryset.annotate(
-            total_rate=Avg('comments_doc__rate')
+            total_rate=Avg('comments_med__rate')
         )
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
         print(filtered_qs)

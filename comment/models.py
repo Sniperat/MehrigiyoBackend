@@ -15,7 +15,7 @@ class CommentMedicine(models.Model):
 
 class CommentDoctor(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT, related_name='comments_doc')
-    user = models.ForeignKey(UserModel, on_delete=models.RESTRICT)
+    user = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='comments_med')
     text = models.TextField(null=True, blank=True)
     rate = models.SmallIntegerField(default=1)
     created_at = models.DateTimeField(auto_now=True, null=True)
