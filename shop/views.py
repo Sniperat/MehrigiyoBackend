@@ -77,6 +77,7 @@ class GetMedicinesWithType(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def get_with_types(self, request, *args, **kwargs):
+        print(request.data['list']+'---------')
         id_list = list(request.data['list'].split(','))
         medicine = Medicine.objects.filter(type_medicine_id__in=id_list)
         page = self.paginate_queryset(medicine)

@@ -40,7 +40,10 @@ class MedicineSerializer(serializers.ModelSerializer):
                 representation['is_favorite'] = False
         except:
             print('asdasdasdasd')
-        representation['rate'] = instance.total_rate or 0
+        try:
+            representation['rate'] = instance.total_rate or 0
+        except:
+            pass
         return representation
 
     class Meta:
