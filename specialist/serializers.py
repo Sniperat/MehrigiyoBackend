@@ -1,6 +1,9 @@
+from django.db.models import Sum
 from rest_framework import serializers
-from .models import Doctor, TypeDoctor, RateDoctor, Advertising
 
+from account.models import UserModel
+from .models import Doctor, TypeDoctor, RateDoctor, Advertising
+from comment.models import CommentDoctor
 
 class AdvertisingSerializer(serializers.ModelSerializer):
 
@@ -19,6 +22,23 @@ class TypeDoctorSerializer(serializers.ModelSerializer):
 class DoctorSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField()
     type_doctor = TypeDoctorSerializer()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        try:
+            user = self.context['user']
+            if instance in user.favorite_medicine.all():
+
+                representation['is_favorite'] = True
+            else:
+                representation['is_favorite'] = False
+        except:
+            print('asdasdasdasd')
+        # doctors = CommentDoctor.objects.filter(doctor=representation,)
+        # representation['rate'] = sum(instance.comments_doc.values('rate', flat=True))
+        representation['rate'] = instance.total_rate or 0
+        # representation['rate'] = Sum(instance__comments_doc__rate)
+        return representation
 
     class Meta:
         model = Doctor

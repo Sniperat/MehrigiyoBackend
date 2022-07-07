@@ -37,6 +37,9 @@ class Medicine(models.Model):
 
     def __str__(self):
         return self.name
+    # @property
+    # def is_favorite(self, user):
+
 
 
 class CartModel(models.Model):

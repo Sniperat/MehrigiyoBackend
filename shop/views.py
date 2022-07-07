@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Avg
 from django.shortcuts import render
 from drf_yasg import openapi
 from rest_framework.decorators import action
@@ -12,6 +13,9 @@ from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerial
 from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
 from rest_framework import viewsets, generics
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.mixins import ListModelMixin
+from rest_framework.viewsets import GenericViewSet
+
 
 class AdvertisingView(APIView):
     # permission_classes = (IsAuthenticated,)
@@ -33,8 +37,7 @@ class TypeMedicineView(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
-from rest_framework.mixins import ListModelMixin
-from rest_framework.viewsets import GenericViewSet
+
 class MedicinesView(ListModelMixin, GenericViewSet):
     queryset = Medicine.objects.all()
     # permission_classes = (IsAuthenticated,)
@@ -44,6 +47,9 @@ class MedicinesView(ListModelMixin, GenericViewSet):
     # @swagger_auto_schema(manual_parameters=[
     #     openapi.Parameter('key', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
     # ])
+    # def get_serializer_context(self):
+    #     return self.request
+
     def get(self, request):
         # key = request.GET.get('key', False)
         # queryset = self.queryset
@@ -51,12 +57,15 @@ class MedicinesView(ListModelMixin, GenericViewSet):
         # if key:
         #     queryset = self.queryset.filter(name__contains=key)
         # serializer = self.get_serializer(queryset, many=True)
-        filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
+        queryset = self.queryset.annotate(
+            total_rate=Avg('comments_doc__rate')
+        )
+        filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
         print(filtered_qs)
 
         page = self.paginate_queryset(filtered_qs)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(page, many=True, context={'user': request.user})
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
         # return ResponseSuccess(data=serializer.data, request=request.method)
 
@@ -72,7 +81,7 @@ class GetMedicinesWithType(viewsets.ModelViewSet):
         medicine = Medicine.objects.filter(type_medicine_id__in=id_list)
         page = self.paginate_queryset(medicine)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(page, many=True, context={'user': request.user})
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
@@ -91,9 +100,8 @@ class GetSingleMedicine(viewsets.ModelViewSet):
 
         if key:
             queryset = self.queryset.filter(name__contains=key)
-        serializer = self.get_serializer(queryset)
+        serializer = self.get_serializer(queryset, context={'user': request.user})
         return ResponseSuccess(data=serializer.data, request=request.method)
-
 
 
 class CartView(APIView):

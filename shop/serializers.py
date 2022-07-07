@@ -27,15 +27,27 @@ class TypeMedicineSerializer(serializers.ModelSerializer):
 
 class MedicineSerializer(serializers.ModelSerializer):
     pictures = PicturesMedicineSerializer(many=True)
-    # image = serializers.SerializerMethodField('get_image_url')
+    # is_favorite = serializers.ReadOnlyField(source='is_favorite')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        try:
+            user = self.context['user']
+            if instance in user.favorite_medicine.all():
+
+                representation['is_favorite'] = True
+            else:
+                representation['is_favorite'] = False
+        except:
+            print('asdasdasdasd')
+        representation['rate'] = instance.total_rate or 0
+        return representation
 
     class Meta:
         model = Medicine
-        fields = '__all__'
+        fields = "__all__"
 
-    # def get_image_url(self, obj):
-    #
-    #     return {obj.image.url}
+
 
 
 class CartSerializer(serializers.ModelSerializer):

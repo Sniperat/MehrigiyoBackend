@@ -1,3 +1,4 @@
+from django.db.models import Sum, Avg
 from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -46,11 +47,14 @@ class DoctorsView(viewsets.ModelViewSet):
     filterset_class = DoctorFilter
 
     def get(self, request):
-        filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
+        queryset = self.queryset.annotate(
+            total_rate=Avg('comments_doc__rate')
+        )
+        filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
 
         page = self.paginate_queryset(filtered_qs)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(page, many=True, context={'user': request.user})
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
@@ -70,7 +74,7 @@ class GetDoctorsWithType(viewsets.ModelViewSet):
 
         if key:
             queryset = self.queryset.filter(name__contains=key)
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True, context={'user': request.user})
 
         return ResponseSuccess(data=serializer.data, request=request.method)
 
@@ -85,13 +89,16 @@ class GetSingleDoctor(viewsets.ModelViewSet):
     ])
     def get(self, request):
         key = request.GET.get('pk', False)
-        queryset = self.queryset
+        from django.db.models import Avg
+        queryset = self.queryset.annotate(
+            total_rate=Avg('comments_doc__rate')
+        )
 
         if key:
             queryset = Doctor.objects.get(id=key)
             queryset.review = queryset.review + 1
             queryset.save()
-        serializer = self.get_serializer(queryset)
+        serializer = self.get_serializer(queryset, context={'user': request.user})
 
         return ResponseSuccess(data=serializer.data, request=request.method)
 

@@ -23,6 +23,7 @@ class CommentDoctorView(APIView):
         if serializer.is_valid():
             comment = CommentDoctor()
             comment.text = request.data['text']
+            comment.rate = request.data['rate']
             comment.user = request.user
             comment.doctor = doctor
             comment.save()
@@ -45,6 +46,7 @@ class CommentMedicineView(APIView):
         if serializer.is_valid():
             comment = CommentMedicine(**serializer.data)
             comment.user = request.user
+            comment.rate = request.data['rate']
             comment.medicine = medicine
             comment.save()
             s = CommentMedicineSerializer(comment)
