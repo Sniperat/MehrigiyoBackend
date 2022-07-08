@@ -25,15 +25,15 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        user = self.context['user']
         try:
-            user = self.context['user']
             if instance in user.favorite_medicine.all():
 
                 representation['is_favorite'] = True
             else:
                 representation['is_favorite'] = False
         except:
-            print('asdasdasdasd')
+            pass
         # doctors = CommentDoctor.objects.filter(doctor=representation,)
         # representation['rate'] = sum(instance.comments_doc.values('rate', flat=True))
         representation['rate'] = instance.total_rate or 0

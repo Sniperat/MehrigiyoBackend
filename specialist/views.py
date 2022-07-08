@@ -54,8 +54,13 @@ class DoctorsView(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(filtered_qs)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, context={'user': request.user})
+            serializer = self.get_serializer(page, many=True)
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+
+    def get_serializer_context(self):
+        context = super(DoctorsView, self).get_serializer_context()
+        context.update({'user': self.request.user})
+        return context
 
 
 class GetDoctorsWithType(viewsets.ModelViewSet):

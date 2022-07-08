@@ -31,15 +31,16 @@ class MedicineSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        user = self.context['user']
+
         try:
-            user = self.context['user']
             if instance in user.favorite_medicine.all():
 
                 representation['is_favorite'] = True
             else:
                 representation['is_favorite'] = False
         except:
-            print('asdasdasdasd')
+            pass
         try:
             representation['rate'] = instance.total_rate or 0
         except:
@@ -49,8 +50,6 @@ class MedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
         fields = "__all__"
-
-
 
 
 class CartSerializer(serializers.ModelSerializer):
