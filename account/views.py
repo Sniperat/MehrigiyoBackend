@@ -119,7 +119,7 @@ class MedicineView(APIView):
     def get(self, request):
         user = request.user
         list_medicine = user.favorite_medicine.all()
-        serializer = MedicineSerializer(list_medicine, many=True)
+        serializer = MedicineSerializer(list_medicine, many=True, context={'user': request.user})
         return ResponseSuccess(data=serializer.data)
 
     def post(self, request, pk):
