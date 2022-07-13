@@ -137,7 +137,8 @@ class CartView(APIView):
     def put(self, request):
         cart = CartModel.objects.get(id=request.data['id'], user=request.user)
         del request.data['id']
-        serializer = CartSerializer(cart, data=request.data, context={'request': request})
+        serializer = CartSerializer(cart, data=request.data, context={'request': request,
+                                                                      'user': request.user})
         if serializer.is_valid():
             serializer.save()
             return ResponseSuccess(data=serializer.data, request=request.method)
