@@ -149,7 +149,7 @@ class DoctorView(APIView):
     def get(self, request):
         user = request.user
         list_doctor = user.favorite_doctor.all()
-        serializer = DoctorSerializer(list_doctor, many=True)
+        serializer = DoctorSerializer(list_doctor, many=True, context={'user': request.user})
         return ResponseSuccess(data=serializer.data)
 
     def post(self, request, pk):

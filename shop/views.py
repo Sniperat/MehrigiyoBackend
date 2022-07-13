@@ -86,8 +86,13 @@ class GetMedicinesWithType(viewsets.ModelViewSet):
         medicine = Medicine.objects.filter(type_medicine_id__in=id_list)
         page = self.paginate_queryset(medicine)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, context={'user': request.user})
+            serializer = self.get_serializer(page, many=True)
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+
+    def get_serializer_context(self):
+        context = super(GetMedicinesWithType, self).get_serializer_context()
+        context.update({'user': self.request.user})
+        return context
 
 
 class GetSingleMedicine(viewsets.ModelViewSet):
@@ -114,16 +119,17 @@ class CartView(APIView):
 
     def get(self, request):
         carts = CartModel.objects.filter(user=request.user, status=1)
-        serializer = CartSerializer(carts, many=True)
+        serializer = CartSerializer(carts, many=True, context={'user': request.user})
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
-        serializer = CartSerializer(data=request.data, context={'request': request})
+        serializer = CartSerializer(data=request.data, context={'request': request,
+                                                                'user': request.user})
         med = Medicine.objects.get(id=request.data['product'])
         if serializer.is_valid():
             cart = CartModel.objects.create(user=request.user, product=med)
             # serializer.save()
-            serializer = CartSerializer(cart)
+            serializer = CartSerializer(cart, context={'user': request.user})
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
