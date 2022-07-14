@@ -167,7 +167,7 @@ class CartView(APIView):
     )
     def get(self, request):
         carts = CartModel.objects.filter(user=request.user, status=1)
-        serializer = CartSerializer(carts, many=True, context={'user': request.user})
+        serializer = CartSerializer(carts, many=True, context={'request': request, 'user': request.user})
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     @swagger_auto_schema(
@@ -187,7 +187,7 @@ class CartView(APIView):
         if serializer.is_valid():
             cart = CartModel.objects.create(user=request.user, product=med)
             # serializer.save()
-            serializer = CartSerializer(cart, context={'user': request.user})
+            serializer = CartSerializer(cart, context={'request': request, 'user': request.user})
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)

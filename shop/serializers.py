@@ -54,7 +54,7 @@ class MedicineSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     product = MedicineSerializer(read_only=True)
-    user = serializers.StringRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = CartModel
