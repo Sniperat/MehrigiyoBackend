@@ -9,6 +9,7 @@ class AdvertisingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advertising
         fields = '__all__'
+        ref_name = "Shop_ad"
 
 
 class PicturesMedicineSerializer(serializers.ModelSerializer):
@@ -31,9 +32,8 @@ class MedicineSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        user = self.context['user']
-
         try:
+            user = self.context['user']
             if instance in user.favorite_medicine.all():
 
                 representation['is_favorite'] = True
@@ -72,6 +72,14 @@ class CartSerializer(serializers.ModelSerializer):
         # instance.product = request.data['product']
         instance.save()
         return instance
+
+
+class CartPostSerializer(serializers.Serializer):
+    product = serializers.IntegerField()
+
+
+class PutSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):

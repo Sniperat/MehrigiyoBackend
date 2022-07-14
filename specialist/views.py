@@ -3,9 +3,12 @@ from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
+from rest_framework import generics
 
 import datetime
 import pytz
@@ -18,20 +21,43 @@ from .filters import DoctorFilter
 utc = pytz.UTC
 
 
-class AdvertisingView(APIView):
+class AdvertisingView(generics.ListAPIView):
+    queryset = Advertising.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = AdvertisingSerializer
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
-    def get(self, request):
-        types = Advertising.objects.all()
-        serializer = AdvertisingSerializer(types, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+    @swagger_auto_schema(
+        operation_id='advertising',
+        operation_description="advertisingView",
+        # request_body=AdvertisingSerializer(),
+        responses={
+            '200': AdvertisingSerializer()
+        },
+    )
+    def get(self, request, *args, **kwargs):
+
+        return self.list(request, *args, **kwargs)
 
 
-class TypeDoctorView(viewsets.ModelViewSet):
+class TypeDoctorView(viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = TypeDoctor.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = TypeDoctorSerializer
 
+    @swagger_auto_schema(
+        operation_id='get_doctor_types',
+        operation_description="get_doctor_types",
+        request_body=TypeDoctorSerializer(),
+        responses={
+            '200': TypeDoctorSerializer()
+        },
+        # method='get'
+        # permission_classes=[IsAuthenticated, ],
+        # tags=['photos'],
+    )
+    # @api_view(['GET'])
+    # @action(detail=True, methods=['get'])
     def get(self, request):
 
         page = self.paginate_queryset(self.queryset)
@@ -40,22 +66,32 @@ class TypeDoctorView(viewsets.ModelViewSet):
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
-class DoctorsView(viewsets.ModelViewSet):
+class DoctorsView(generics.ListAPIView):
     queryset = Doctor.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = DoctorSerializer
     filterset_class = DoctorFilter
 
-    def get(self, request):
+    @swagger_auto_schema(
+        operation_id='get_doctors',
+        operation_description="get_doctors",
+        # request_body=DoctorSerializer(),
+        responses={
+            '200': DoctorSerializer()
+        },
+        # method='get'
+        # permission_classes=[IsAuthenticated, ],
+        # tags=['photos'],
+    )
+    def get(self, request, *args, **kwargs):
         queryset = self.queryset.annotate(
             total_rate=Avg('comments_doc__rate')
         )
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
+        self.queryset = filtered_qs
+        print('333333333333')
 
-        page = self.paginate_queryset(filtered_qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+        return self.list(request, *args, **kwargs)
 
     def get_serializer_context(self):
         context = super(DoctorsView, self).get_serializer_context()
@@ -63,25 +99,26 @@ class DoctorsView(viewsets.ModelViewSet):
         return context
 
 
-class GetDoctorsWithType(viewsets.ModelViewSet):
+class GetDoctorsWithType(generics.ListAPIView):
     queryset = Doctor.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = DoctorSerializer
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
+    @swagger_auto_schema(
+        # request_body=DoctorSerializer(),
+        manual_parameters=[
+        openapi.Parameter('type_doctor_id', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
     ], operation_description='GET /articles/today/')
     @action(detail=False, methods=['get'])
-    # @action(methods=['GET'], url_path='types/one/', url_name='asd', detail=True)
-    def get(self, request):
-        key = request.GET.get('pk', False)
-        queryset = self.queryset
-
+    def get(self, request, *args, **kwargs):
+        key = request.GET.get('type_doctor_id', False)
         if key:
-            queryset = self.queryset.filter(name__contains=key)
-        serializer = self.get_serializer(queryset, many=True, context={'user': request.user})
-
-        return ResponseSuccess(data=serializer.data, request=request.method)
+            # self.queryset =
+            print('22222222222222')
+            self.queryset = self.queryset.filter(type_doctor_id=key)
+            print('333333333333')
+        return self.list(request, *args, **kwargs)
 
 
 class GetSingleDoctor(viewsets.ModelViewSet):

@@ -4,12 +4,14 @@ from django.shortcuts import render
 from drf_yasg import openapi
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from .filters import ProductFilter
 from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
 from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
-                          OrderShowSerializer, AdvertisingSerializer, ListSerializer)
+                          OrderShowSerializer, AdvertisingSerializer, ListSerializer, CartPostSerializer,
+                          PutSerializer)
 from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
 from rest_framework import viewsets, generics
 from drf_yasg.utils import swagger_auto_schema
@@ -17,20 +19,41 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 
-class AdvertisingView(APIView):
+class AdvertisingShopView(generics.ListAPIView):
+    queryset = Advertising.objects.all()
     # permission_classes = (IsAuthenticated,)
+    serializer_class = AdvertisingSerializer
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
-    def get(self, request):
-        types = Advertising.objects.all()
-        serializer = AdvertisingSerializer(types, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+    @swagger_auto_schema(
+        operation_id='advertising',
+        operation_description="advertisingView",
+        # request_body=AdvertisingSerializer(),
+        responses={
+            '200': AdvertisingSerializer()
+        },
+    )
+    def get(self, request, *args, **kwargs):
+
+        return self.list(request, *args, **kwargs)
 
 
-class TypeMedicineView(viewsets.ModelViewSet):
+class TypeMedicineView(viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = TypeMedicine.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = TypeMedicineSerializer
 
+    @swagger_auto_schema(
+        operation_id='get_medicines_types',
+        operation_description="get_medicines_types",
+        request_body=TypeMedicineSerializer(),
+        responses={
+            '200': TypeMedicineSerializer()
+        },
+        # method='get'
+        # permission_classes=[IsAuthenticated, ],
+        # tags=['photos'],
+    )
     def get(self, request):
         page = self.paginate_queryset(self.queryset)
         if page is not None:
@@ -38,61 +61,77 @@ class TypeMedicineView(viewsets.ModelViewSet):
             return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
-class MedicinesView(ListModelMixin, GenericViewSet):
+class MedicinesView(generics.ListAPIView):
     queryset = Medicine.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = MedicineSerializer
     filterset_class = ProductFilter
 
-    # @swagger_auto_schema(manual_parameters=[
-    #     openapi.Parameter('key', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
-    # ])
-    # def get_serializer_context(self):
-    #     return self.request
-
-    def get(self, request):
-        # key = request.GET.get('key', False)
-        # queryset = self.queryset
-
-        # if key:
-        #     queryset = self.queryset.filter(name__contains=key)
-        # serializer = self.get_serializer(queryset, many=True)
-        queryset = Medicine.objects.annotate(
+    @swagger_auto_schema(
+        operation_id='get_doctors',
+        operation_description="get_doctors",
+        # request_body=DoctorSerializer(),
+        responses={
+            '200': MedicineSerializer()
+        },
+        # method='get'
+        # permission_classes=[IsAuthenticated, ],
+        # tags=['photos'],
+    )
+    def get(self, request, *args, **kwargs):
+        queryset = self.queryset.annotate(
             total_rate=Avg('comments_med__rate')
         )
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
-        print(filtered_qs)
+        self.queryset = filtered_qs
+        print('333333333333')
 
-        page = self.paginate_queryset(filtered_qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
-        # return ResponseSuccess(data=serializer.data, request=request.method)
+        return self.list(request, *args, **kwargs)
+    # def get(self, request):
+    #     # key = request.GET.get('key', False)
+    #     # queryset = self.queryset
+    #
+    #     # if key:
+    #     #     queryset = self.queryset.filter(name__contains=key)
+    #     # serializer = self.get_serializer(queryset, many=True)
+    #     queryset = Medicine.objects.annotate(
+    #         total_rate=Avg('comments_med__rate')
+    #     )
+    #     filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
+    #     print(filtered_qs)
+    #
+    #     page = self.paginate_queryset(filtered_qs)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+    #     # return ResponseSuccess(data=serializer.data, request=request.method)
 
     def get_serializer_context(self):
         context = super(MedicinesView, self).get_serializer_context()
         context.update({'user': self.request.user})
         return context
 
-class GetMedicinesWithType(viewsets.ModelViewSet):
+
+class GetMedicinesWithType(generics.ListAPIView):
     queryset = Medicine.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = MedicineSerializer
 
-    @action(detail=True, methods=['post'])
-    def get_with_types(self, request, *args, **kwargs):
-        print(request.data['list']+'---------')
-        id_list = list(request.data['list'].split(','))
-        medicine = Medicine.objects.filter(type_medicine_id__in=id_list)
-        page = self.paginate_queryset(medicine)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
-
-    def get_serializer_context(self):
-        context = super(GetMedicinesWithType, self).get_serializer_context()
-        context.update({'user': self.request.user})
-        return context
+    @swagger_auto_schema(
+        # request_body=DoctorSerializer(),
+        manual_parameters=[
+            openapi.Parameter('type_medicines_id', openapi.IN_QUERY, description="test manual param",
+                              type=openapi.TYPE_NUMBER)
+        ], operation_description='GET /articles/today/')
+    @action(detail=False, methods=['get'])
+    def get(self, request, *args, **kwargs):
+        key = request.GET.get('type_medicines_id', False)
+        if key:
+            # self.queryset =
+            print('22222222222222')
+            self.queryset = self.queryset.filter(type_medicine_id=key)
+            print('333333333333')
+        return self.list(request, *args, **kwargs)
 
 
 class GetSingleMedicine(viewsets.ModelViewSet):
@@ -116,13 +155,32 @@ class GetSingleMedicine(viewsets.ModelViewSet):
 
 class CartView(APIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = CartSerializer
 
+    @swagger_auto_schema(
+        operation_id='get_Cart',
+        operation_description="get_Cart",
+        responses={
+            '200': CartSerializer()
+        },
+
+    )
     def get(self, request):
         carts = CartModel.objects.filter(user=request.user, status=1)
         serializer = CartSerializer(carts, many=True, context={'user': request.user})
         return ResponseSuccess(data=serializer.data, request=request.method)
 
+    @swagger_auto_schema(
+        operation_id='create_Cart',
+        operation_description="send 'product' = id product",
+        request_body=CartPostSerializer(),
+        responses={
+            '200': CartSerializer()
+        },
+
+    )
     def post(self, request):
+        print('asdasd')
         serializer = CartSerializer(data=request.data, context={'request': request,
                                                                 'user': request.user})
         med = Medicine.objects.get(id=request.data['product'])
@@ -134,6 +192,15 @@ class CartView(APIView):
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
 
+    @swagger_auto_schema(
+        operation_id='update_Cart',
+        operation_description="UpdateCart",
+        request_body=PutSerializer(),
+        responses={
+            '200': CartSerializer()
+        },
+
+    )
     def put(self, request):
         cart = CartModel.objects.get(id=request.data['id'], user=request.user)
         del request.data['id']
@@ -145,6 +212,15 @@ class CartView(APIView):
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
 
+    @swagger_auto_schema(
+        operation_id='delete_Cart',
+        operation_description="DeleteCart",
+        request_body=PutSerializer(),
+        responses={
+            '200': CartSerializer()
+        },
+
+    )
     def delete(self, request):
         try:
             CartModel.objects.get(id=request.data['id'], user=request.user).delete()
@@ -155,12 +231,31 @@ class CartView(APIView):
 
 class OrderView(APIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = CartSerializer
 
+    @swagger_auto_schema(
+        operation_id='get_order_model',
+        operation_description="get_order_model",
+        # request_body=OrderShowSerializer(),
+        responses={
+            '200': OrderShowSerializer()
+        },
+
+    )
     def get(self, request):
         orders = OrderModel.objects.filter(user=request.user)
         serializer = OrderShowSerializer(orders, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
+    @swagger_auto_schema(
+        operation_id='create_cart_model',
+        operation_description="To create cart model",
+        # request_body=OrderShowSerializer(),
+        responses={
+            '200': OrderShowSerializer()
+        },
+
+    )
     def post(self, request):
         carts = CartModel.objects.filter(user=request.user, status=1)
         order = OrderModel()
@@ -177,6 +272,15 @@ class OrderView(APIView):
         serializer = OrderShowSerializer(order)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
+    @swagger_auto_schema(
+        operation_id='create_order_model',
+        operation_description="To change carts to order",
+        request_body=PutSerializer(),
+        responses={
+            '200': OrderShowSerializer()
+        },
+
+    )
     def put(self, request):
         try:
             order = OrderModel.objects.get(id=request.data['id'])

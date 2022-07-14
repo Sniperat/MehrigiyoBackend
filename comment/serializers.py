@@ -4,7 +4,6 @@ from comment.models import CommentDoctor, CommentMedicine
 
 
 class CommentDoctorSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CommentDoctor
         fields = '__all__'
@@ -15,7 +14,6 @@ class CommentDoctorSerializer(serializers.ModelSerializer):
 
 
 class CommentMedicineSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CommentMedicine
         fields = '__all__'
@@ -23,3 +21,9 @@ class CommentMedicineSerializer(serializers.ModelSerializer):
             'user': {'required': False},
             'medicine': {'required': False},
         }
+
+
+class CommentPostSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(required=True)
+    text = serializers.CharField(max_length=500, required=False)
+    rate = serializers.IntegerField(max_value=5, required=False, default=1)

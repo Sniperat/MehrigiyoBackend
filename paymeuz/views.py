@@ -1,6 +1,7 @@
 import base64
 import time
 
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 import math
 from rest_framework import status
@@ -11,18 +12,35 @@ from .methods import (create_cards, cards_get_verify_code, cards_verify, cards_r
 from rest_framework.views import APIView
 from .keywords import *
 from .models import PaymeTransactionModel, Card
-from .serializers import PaycomOperationSerialzer, CardSerializer, CardInputSerializer
+from .serializers import PaycomOperationSerialzer, CardSerializer, CardInputSerializer, CardConfirmSerializer, \
+    CardSendConfirmSerializer
 from shop.models import OrderModel
 
 
 class CardView(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        operation_id='card',
+        operation_description="Card data",
+        # request_body=AdvertisingSerializer(),
+        responses={
+            '200': CardSerializer()
+        },
+    )
     def get(self, request):
         card = Card.objects.filter(owner=request.user)
         serializer = CardSerializer(card, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
+    @swagger_auto_schema(
+        operation_id='create_card',
+        operation_description="Create card data",
+        request_body=CardInputSerializer(),
+        responses={
+            '200': CardSerializer()
+        },
+    )
     def post(self, request):
         serializer = CardInputSerializer(data=request.data)
         if serializer.is_valid():
@@ -52,6 +70,14 @@ class CardView(APIView):
             else:
                 return ResponseFail(data=serializer.errors)
 
+    @swagger_auto_schema(
+        operation_id='activate_card',
+        operation_description="Activate card data",
+        request_body=CardConfirmSerializer(),
+        responses={
+            '200': CardSerializer()
+        },
+    )
     def put(self, request):
         card = Card.objects.get(id=request.data['card_id'])
         print(card)
@@ -71,10 +97,35 @@ class CardView(APIView):
                 return ResponseFail(data=TIME_OUT_MESSAGE)
             return ResponseFail(data=data)
 
+    @swagger_auto_schema(
+        operation_id='remove_card',
+        operation_description="Activate card data",
+        request_body=CardSendConfirmSerializer(),
+        # responses={
+        #     '200': CardSerializer()
+        # },
+    )
+    def delete(self, request):
+        card = Card.objects.get(id=request.data['card_id'])
+        data = cards_remove(card.token)
+        if data:
+            card.delete()
+            return ResponseSuccess(data=data)
+        else:
+            return ResponseFail()
+
 
 class CardGetVerifyCodeView(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        operation_id='send_verify_card',
+        operation_description="Send verify card data",
+        request_body=CardSendConfirmSerializer(),
+        # responses={
+        #     '200': CardSerializer()
+        # },
+    )
     def post(self, request):
         card = Card.objects.get(id=request.data['card_id'])
         data = cards_get_verify_code(token=card.token)
@@ -90,26 +141,20 @@ class CardGetVerifyCodeView(APIView):
         # return ResponseSuccess(data=data)
 
 
-class CardRemoveView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def delete(self, request, pk):
-        card = Card.objects.get(id=pk)
-        data = cards_remove(card.token)
-        if data:
-            card.delete()
-            return ResponseSuccess(data=data)
-        else:
-            return ResponseFail()
-
-
 class PayTransactionView(APIView):
     permission_classes = (IsAuthenticated,)
-
-    def post(self, request, pk):
+    @swagger_auto_schema(
+        operation_id='send_verify_card',
+        operation_description="Send verify card data",
+        request_body=CardSendConfirmSerializer(),
+        # responses={
+        #     '200': CardSerializer()
+        # },
+    )
+    def post(self, request):
         order = None
         try:
-            order = OrderModel.objects.get(id=pk, payment_status=1)
+            order = OrderModel.objects.get(id=request.data['card_id'], payment_status=1)
         except:
             return ResponseFail(data='Order not found')
 

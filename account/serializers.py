@@ -3,6 +3,13 @@ from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
 from config.validators import PhoneValidator
 
 
+class PkSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(required=True)
+
+class RegionPostSerializer(serializers.Serializer):
+    region = serializers.IntegerField(required=True)
+
+
 class SmsSerializer(serializers.Serializer):
     phone = serializers.CharField(validators=[PhoneValidator()])
 

@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
@@ -6,19 +9,42 @@ from config.responses import ResponseSuccess, ResponseFail
 from shop.models import Medicine
 from specialist.models import Doctor
 from .models import CommentDoctor, CommentMedicine
-from .serializers import CommentDoctorSerializer, CommentMedicineSerializer
+from .serializers import CommentDoctorSerializer, CommentMedicineSerializer, CommentPostSerializer
 
 
 class CommentDoctorView(APIView):
+    # queryset = NewsModel.objects.all()
     permission_classes = (IsAuthenticated,)
+    serializer_class = CommentDoctorSerializer
 
-    def get(self, request, pk):
-        comment = CommentDoctor.objects.filter(doctor_id=pk)
-        serializer = CommentDoctorSerializer(comment, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
 
-    def post(self, request, pk):
-        doctor = Doctor.objects.get(id=pk)
+    @swagger_auto_schema(
+        # request_body=DoctorSerializer(),
+        responses={
+            '200': CommentDoctorSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param",
+                              type=openapi.TYPE_NUMBER)
+        ], operation_description='GET News')
+    @action(detail=False, methods=['get'])
+    def get(self, request):
+        key = request.GET.get('pk', False)
+        if key:
+            comment = CommentDoctor.objects.filter(doctor_id=key)
+            serializer = CommentDoctorSerializer(comment, many=True)
+            return ResponseSuccess(data=serializer.data, request=request.method)
+
+    @swagger_auto_schema(
+        operation_id='rate_doctor',
+        operation_description="rate_doctor",
+        request_body=CommentPostSerializer(),
+        responses={
+            '200': CommentDoctorSerializer()
+        },
+    )
+    def post(self, request):
+        doctor = Doctor.objects.get(id=request.data['pk'])
         serializer = CommentDoctorSerializer(data=request.data)
         if serializer.is_valid():
             comment = CommentDoctor()
@@ -35,13 +61,33 @@ class CommentDoctorView(APIView):
 class CommentMedicineView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, pk):
-        comment = CommentMedicine.objects.filter(medicine_id=pk)
-        serializer = CommentMedicineSerializer(comment, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
+    @swagger_auto_schema(
+        # request_body=DoctorSerializer(),
+        responses={
+            '200': CommentMedicineSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param",
+                              type=openapi.TYPE_NUMBER)
+        ], operation_description='GET News')
+    @action(detail=False, methods=['get'])
+    def get(self, request):
+        key = request.GET.get('pk', False)
+        if key:
+            comment = CommentMedicine.objects.filter(medicine_id=pk)
+            serializer = CommentMedicineSerializer(comment, many=True)
+            return ResponseSuccess(data=serializer.data, request=request.method)
 
-    def post(self, request, pk):
-        medicine = Medicine.objects.get(id=pk)
+    @swagger_auto_schema(
+        operation_id='rate_medicines',
+        operation_description="rate_medicines",
+        request_body=CommentPostSerializer(),
+        responses={
+            '200': CommentMedicineSerializer()
+        },
+    )
+    def post(self, request):
+        medicine = Medicine.objects.get(id=request.data['pk'])
         serializer = CommentMedicineSerializer(data=request.data)
         if serializer.is_valid():
             comment = CommentMedicine(**serializer.data)

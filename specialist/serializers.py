@@ -22,11 +22,13 @@ class TypeDoctorSerializer(serializers.ModelSerializer):
 class DoctorSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField()
     type_doctor = TypeDoctorSerializer()
+    rate = serializers.CharField(read_only=True, )
+    is_favorite = serializers.BooleanField(read_only=True, )
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        user = self.context['user']
         try:
+            user = self.context['user']
             if instance in user.favorite_medicine.all():
 
                 representation['is_favorite'] = True
@@ -36,13 +38,17 @@ class DoctorSerializer(serializers.ModelSerializer):
             pass
         # doctors = CommentDoctor.objects.filter(doctor=representation,)
         # representation['rate'] = sum(instance.comments_doc.values('rate', flat=True))
-        representation['rate'] = instance.total_rate or 0
+        try:
+            representation['rate'] = instance.total_rate or 0
+        except:
+            pass
         # representation['rate'] = Sum(instance__comments_doc__rate)
         return representation
 
     class Meta:
         model = Doctor
         fields = '__all__'
+        extra_fields = ['rate', 'is_favorite']
 
 
 class RateSerializer(serializers.ModelSerializer):

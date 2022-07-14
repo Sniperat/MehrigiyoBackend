@@ -2,5 +2,5 @@ from django.urls import path
 from .views import NewsView
 
 urlpatterns = [
-    path('', NewsView.as_view({'list': 'get'}))
+    path('news/', NewsView.as_view())
 ]

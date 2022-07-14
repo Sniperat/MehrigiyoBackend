@@ -40,3 +40,13 @@ class CardSerializer(serializers.ModelSerializer):
 class CardInputSerializer(serializers.Serializer):
     number = serializers.CharField(max_length=16)
     expire = serializers.CharField(max_length=4)
+
+
+class CardConfirmSerializer(serializers.Serializer):
+    card_id = serializers.IntegerField()
+    code = serializers.CharField(max_length=6)
+
+
+class CardSendConfirmSerializer(serializers.Serializer):
+    card_id = serializers.IntegerField()
+    # code = serializers.CharField(max_length=6)
