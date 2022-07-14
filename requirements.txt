@@ -23,6 +23,7 @@ django-rest-swagger==2.2.0
 djangorestframework==3.13.1
 djangorestframework-simplejwt==5.0.0
 drf-yasg==1.20.0
+generics==3.6.0
 hyperlink==21.0.0
 i18n==0.2
 idna==3.3
