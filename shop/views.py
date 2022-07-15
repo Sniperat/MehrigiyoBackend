@@ -120,17 +120,15 @@ class GetMedicinesWithType(generics.ListAPIView):
     @swagger_auto_schema(
         # request_body=DoctorSerializer(),
         manual_parameters=[
-            openapi.Parameter('type_medicines_id', openapi.IN_QUERY, description="test manual param",
-                              type=openapi.TYPE_NUMBER)
+            openapi.Parameter('type_ides', openapi.IN_QUERY, description="test manual param",
+                              type=openapi.TYPE_STRING)
         ], operation_description='GET /articles/today/')
     @action(detail=False, methods=['get'])
     def get(self, request, *args, **kwargs):
-        key = request.GET.get('type_medicines_id', False)
+        key = request.GET.get('type_ides', False)
         if key:
-            # self.queryset =
-            print('22222222222222')
-            self.queryset = self.queryset.filter(type_medicine_id=key)
-            print('333333333333')
+            keys = key.split(',')
+            self.queryset = self.queryset.filter(type_medicine_id__in=keys)
         return self.list(request, *args, **kwargs)
 
 
@@ -186,6 +184,7 @@ class CartView(APIView):
         med = Medicine.objects.get(id=request.data['product'])
         if serializer.is_valid():
             cart = CartModel.objects.create(user=request.user, product=med)
+
             # serializer.save()
             serializer = CartSerializer(cart, context={'request': request, 'user': request.user})
             return ResponseSuccess(data=serializer.data, request=request.method)
