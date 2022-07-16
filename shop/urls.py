@@ -11,7 +11,7 @@ urlpatterns = [
     path('advertising/', AdvertisingShopView.as_view()),
 
     # path('types/', TypeMedicineView.as_view()),
-    path('types/one/', GetMedicinesWithType.as_view()),
+    # path('types/one/', GetMedicinesWithType.as_view()),
     path('medicines/', MedicinesView.as_view()),
     # path('medicines/<int:pk>/', GetSingleMedicine.as_view({'list': 'get'})),
     path('cart/', CartView.as_view()),

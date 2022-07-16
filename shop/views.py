@@ -74,37 +74,25 @@ class MedicinesView(generics.ListAPIView):
         responses={
             '200': MedicineSerializer()
         },
-        # method='get'
-        # permission_classes=[IsAuthenticated, ],
-        # tags=['photos'],
+        manual_parameters=[
+            openapi.Parameter('type_ides', openapi.IN_QUERY, description="test manual param",
+                              type=openapi.TYPE_STRING)
+        ],
     )
     def get(self, request, *args, **kwargs):
+        key = request.GET.get('type_ides', False)
+
         queryset = self.queryset.annotate(
             total_rate=Avg('comments_med__rate')
         )
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
         self.queryset = filtered_qs
+        if key:
+            keys = key.split(',')
+            self.queryset = self.queryset.filter(type_medicine_id__in=keys)
         print('333333333333')
 
         return self.list(request, *args, **kwargs)
-    # def get(self, request):
-    #     # key = request.GET.get('key', False)
-    #     # queryset = self.queryset
-    #
-    #     # if key:
-    #     #     queryset = self.queryset.filter(name__contains=key)
-    #     # serializer = self.get_serializer(queryset, many=True)
-    #     queryset = Medicine.objects.annotate(
-    #         total_rate=Avg('comments_med__rate')
-    #     )
-    #     filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
-    #     print(filtered_qs)
-    #
-    #     page = self.paginate_queryset(filtered_qs)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
-    #     # return ResponseSuccess(data=serializer.data, request=request.method)
 
     def get_serializer_context(self):
         context = super(MedicinesView, self).get_serializer_context()

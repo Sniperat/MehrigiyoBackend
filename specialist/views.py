@@ -79,18 +79,20 @@ class DoctorsView(generics.ListAPIView):
         responses={
             '200': DoctorSerializer()
         },
-        # method='get'
-        # permission_classes=[IsAuthenticated, ],
-        # tags=['photos'],
+        manual_parameters=[
+            openapi.Parameter('type_ides', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
+        ]
     )
     def get(self, request, *args, **kwargs):
+        key = request.GET.get('type_ides', False)
         queryset = self.queryset.annotate(
             total_rate=Avg('comments_doc__rate')
         )
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
         self.queryset = filtered_qs
-        print('333333333333')
-
+        if key:
+            keys = key.split(',')
+            self.queryset = self.queryset.filter(type_doctor_id__in=keys)
         return self.list(request, *args, **kwargs)
 
     def get_serializer_context(self):

@@ -228,7 +228,7 @@ class MedicineView(generics.ListAPIView, APIView):
 
 class DoctorView(generics.ListAPIView, APIView):
     permission_classes = (IsAuthenticated,)
-
+    serializer_class = DoctorSerializer
     @swagger_auto_schema(
         operation_id='get_favorite_doctors',
         operation_description="get_favorite_doctors",
