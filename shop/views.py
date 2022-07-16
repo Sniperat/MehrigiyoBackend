@@ -84,7 +84,7 @@ class MedicinesView(generics.ListAPIView):
 
         queryset = self.queryset.annotate(
             total_rate=Avg('comments_med__rate')
-        )
+        ).order_by('-total_rate')
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
         self.queryset = filtered_qs
         if key:
