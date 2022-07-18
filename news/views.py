@@ -4,8 +4,8 @@ from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import NewsModelSerializer
-from .models import NewsModel
+from .serializers import NewsModelSerializer, TagsSerializer, InputSerializer, TagsWithNewsSerializer
+from .models import NewsModel, TagsModel
 from .filters import NewsFilter
 
 
@@ -33,3 +33,33 @@ class NewsView(generics.ListAPIView):
     #     if page is not None:
     #         serializer = self.get_serializer(page, many=True)
     #         return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+
+
+class TagView(generics.ListAPIView):
+    queryset = TagsModel.objects.all()
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = TagsWithNewsSerializer
+
+    @swagger_auto_schema(
+        operation_id='tags',
+        operation_description="get tags",
+        # request_body=TagsSerializer(),
+        responses={
+            '200': TagsSerializer()
+        },
+    )
+    def get(self, request, *args, **kwargs):
+
+        return self.list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_id='tags',
+        operation_description="post tags",
+        request_body=InputSerializer(),
+        responses={
+            '200': TagsWithNewsSerializer()
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        self.queryset = TagsModel.objects.filter(tag_name=request.data['tag'])
+        return self.list(request, *args, **kwargs)

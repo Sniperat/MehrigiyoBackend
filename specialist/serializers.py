@@ -16,7 +16,7 @@ class TypeDoctorSerializer(serializers.ModelSerializer):
     # get_doctors_count = serializers.SerializerMethodField('')
     class Meta:
         model = TypeDoctor
-        fields = ['id', 'name', 'image', 'get_doctors_count']
+        fields = ['id', 'name', 'name_uz', 'name_ru', 'name_en', 'image', 'get_doctors_count']
 
 
 class DoctorSerializer(serializers.ModelSerializer):

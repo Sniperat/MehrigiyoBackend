@@ -170,6 +170,22 @@ class AddAddressView(APIView):
             return ResponseSuccess(request=request.method)
         return ResponseFail(data='Bunday Viloyat mavjud emas', request=request.method)
 
+    @swagger_auto_schema(
+        # request_body=DoctorSerializer(),
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="Delivery address",
+                              type=openapi.TYPE_NUMBER)
+        ], operation_description='')
+    @action(detail=False, methods=['delete'])
+    def delete(self, request):
+        key = request.GET.get('pk', False)
+        if key:
+            DeliveryAddress.objects.get(id=key).delete()
+
+            return ResponseSuccess(request=request.method)
+        return ResponseFail(data='Bunday Delivery address mavjud emas', request=request.method)
+
+
 
 class MedicineView(generics.ListAPIView, APIView):
     permission_classes = (IsAuthenticated,)

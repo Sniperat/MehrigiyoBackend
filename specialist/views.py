@@ -40,7 +40,7 @@ class AdvertisingView(generics.ListAPIView):
         return self.list(request, *args, **kwargs)
 
 
-class TypeDoctorView(viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
+class TypeDoctorView(generics.ListAPIView):
     queryset = TypeDoctor.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = TypeDoctorSerializer
@@ -48,22 +48,14 @@ class TypeDoctorView(viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     @swagger_auto_schema(
         operation_id='get_doctor_types',
         operation_description="get_doctor_types",
-        request_body=TypeDoctorSerializer(),
+        # request_body=TypeDoctorSerializer(),
         responses={
             '200': TypeDoctorSerializer()
         },
-        # method='get'
-        # permission_classes=[IsAuthenticated, ],
-        # tags=['photos'],
-    )
-    # @api_view(['GET'])
-    # @action(detail=True, methods=['get'])
-    def get(self, request):
 
-        page = self.paginate_queryset(self.queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 
 class DoctorsView(generics.ListAPIView):

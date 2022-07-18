@@ -6,9 +6,10 @@ router = DefaultRouter()
 router.register(r'types', TypeDoctorView)
 # router.register(r'types/one', GetDoctorsWithType)
 urlpatterns = [
-    path('', include(router.urls)),
+    # path('', include(router.urls)),
     # path('types/', TypeDoctorView.as_view({'list': 'get'})),
     # path('types/one/', GetDoctorsWithType.as_view()),
+    path('types/', TypeDoctorView.as_view()),
     path('doctors/', DoctorsView.as_view()),
     path('advertising/', AdvertisingView.as_view()),
     path('doctors/one/', GetSingleDoctor.as_view({'list': 'get'})),

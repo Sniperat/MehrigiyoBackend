@@ -1,6 +1,6 @@
 from django.contrib import admin
 from modeltranslation.admin import TabbedTranslationAdmin
-from .models import NewsModel
+from .models import NewsModel, TagsModel
 
 
 class NewsAdmin(TabbedTranslationAdmin):
@@ -8,4 +8,5 @@ class NewsAdmin(TabbedTranslationAdmin):
 
 
 admin.site.register(NewsModel, NewsAdmin)
+admin.site.register(TagsModel)
 
