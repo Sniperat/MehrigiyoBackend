@@ -5,7 +5,7 @@ from .models import NewsModel, TagsModel
 class TagsSerializer(ModelSerializer):
     class Meta:
         model = TagsModel
-        fields = ['tag_name']
+        fields = '__all__'
 
 
 class NewsModelSerializer(ModelSerializer):

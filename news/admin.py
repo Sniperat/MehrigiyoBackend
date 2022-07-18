@@ -7,6 +7,10 @@ class NewsAdmin(TabbedTranslationAdmin):
     list_display = ('name', 'description',)
 
 
+class TagsAdmin(TabbedTranslationAdmin):
+    list_display = ('tag_name',)
+
+
 admin.site.register(NewsModel, NewsAdmin)
-admin.site.register(TagsModel)
+admin.site.register(TagsModel, TagsAdmin)
 

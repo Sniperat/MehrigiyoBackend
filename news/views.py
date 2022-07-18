@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, generics
 from rest_framework.views import APIView
@@ -22,9 +23,15 @@ class NewsView(generics.ListAPIView):
         responses={
             '200': NewsModelSerializer()
         },
+        manual_parameters=[
+            openapi.Parameter('tag_id', openapi.IN_QUERY, description="test manual param",
+                              type=openapi.TYPE_STRING)
+        ],
     )
     def get(self, request, *args, **kwargs):
-
+        key = request.GET.get('tag_id', False)
+        if key:
+            self.queryset = NewsModel.objects.filter(hashtag_id=key)
         return self.list(request, *args, **kwargs)
     # def get(self, request):
     #     filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
@@ -38,7 +45,7 @@ class NewsView(generics.ListAPIView):
 class TagView(generics.ListAPIView):
     queryset = TagsModel.objects.all()
     # permission_classes = (IsAuthenticated,)
-    serializer_class = TagsWithNewsSerializer
+    serializer_class = TagsSerializer
 
     @swagger_auto_schema(
         operation_id='tags',
@@ -52,14 +59,14 @@ class TagView(generics.ListAPIView):
 
         return self.list(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_id='tags',
-        operation_description="post tags",
-        request_body=InputSerializer(),
-        responses={
-            '200': TagsWithNewsSerializer()
-        },
-    )
-    def post(self, request, *args, **kwargs):
-        self.queryset = TagsModel.objects.filter(tag_name=request.data['tag'])
-        return self.list(request, *args, **kwargs)
+    # @swagger_auto_schema(
+    #     operation_id='tags',
+    #     operation_description="post tags",
+    #     request_body=InputSerializer(),
+    #     responses={
+    #         '200': TagsWithNewsSerializer()
+    #     },
+    # )
+    # def post(self, request, *args, **kwargs):
+    #     self.queryset = TagsModel.objects.filter(tag_name=request.data['tag'])
+    #     return self.list(request, *args, **kwargs)
