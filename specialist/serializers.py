@@ -24,6 +24,7 @@ class DoctorSerializer(serializers.ModelSerializer):
     type_doctor = TypeDoctorSerializer()
     rate = serializers.CharField(read_only=True, )
     is_favorite = serializers.BooleanField(read_only=True, )
+    top = serializers.BooleanField(read_only=True, )
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -40,6 +41,18 @@ class DoctorSerializer(serializers.ModelSerializer):
         # representation['rate'] = sum(instance.comments_doc.values('rate', flat=True))
         try:
             representation['rate'] = instance.total_rate or 0
+            print('asdasd 1')
+            print(instance.total_rate)
+
+            if representation['rate'] >= 4.5 and representation['review'] >= 15:
+                print('asdasd 2')
+
+                representation['top'] = True
+            else:
+                print('asdasd 3')
+
+                representation['top'] = False
+
         except:
             pass
         # representation['rate'] = Sum(instance__comments_doc__rate)

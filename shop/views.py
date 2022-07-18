@@ -34,7 +34,6 @@ class AdvertisingShopView(generics.ListAPIView):
         },
     )
     def get(self, request, *args, **kwargs):
-
         return self.list(request, *args, **kwargs)
 
 
@@ -86,6 +85,9 @@ class MedicinesView(generics.ListAPIView):
             total_rate=Avg('comments_med__rate')
         ).order_by('-total_rate')
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
+        for i in filtered_qs:
+            i.review = i.review + 1
+            i.save()
         self.queryset = filtered_qs
         if key:
             keys = key.split(',')
@@ -123,13 +125,13 @@ class GetMedicinesWithType(generics.ListAPIView):
 class GetSingleMedicine(viewsets.ModelViewSet):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
+
     # permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('pk', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
     ])
     def get(self, request):
-
         key = request.GET.get('pk', False)
         queryset = self.queryset
 
@@ -306,4 +308,3 @@ class OrderView(APIView):
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
-

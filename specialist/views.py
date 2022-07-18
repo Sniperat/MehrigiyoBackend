@@ -81,6 +81,9 @@ class DoctorsView(generics.ListAPIView):
             total_rate=Avg('comments_doc__rate')
         ).order_by('-total_rate')
         filtered_qs = self.filterset_class(request.GET, queryset=queryset).qs
+        for i in filtered_qs:
+            i.review = i.review + 1
+            i.save()
         self.queryset = filtered_qs
         if key:
             keys = key.split(',')
