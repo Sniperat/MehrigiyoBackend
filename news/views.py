@@ -2,6 +2,7 @@ from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, generics
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.responses import ResponseSuccess, ResponseFail
@@ -42,7 +43,7 @@ class NewsView(generics.ListAPIView):
     #         return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
 
 
-class TagView(generics.ListAPIView):
+class TagView(APIView):
     queryset = TagsModel.objects.all()
     # permission_classes = (IsAuthenticated,)
     serializer_class = TagsSerializer
@@ -54,10 +55,21 @@ class TagView(generics.ListAPIView):
         responses={
             '200': TagsSerializer()
         },
+        manual_parameters=[
+            openapi.Parameter('limit', openapi.IN_QUERY, description="Number of results to return per page.",
+                              type=openapi.TYPE_NUMBER)
+        ],
     )
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
+        key = request.GET.get('limit', False)
+        asd = TagsModel.objects.all()
+        if key:
+            asd = TagsModel.objects.all()[:int(key)]
+        serializer = TagsSerializer(asd, many=True)
+        return Response(data=serializer.data)
+    # def get(self, request, *args, **kwargs):
 
-        return self.list(request, *args, **kwargs)
+        # return self.list(request, *args, **kwargs)
 
     # @swagger_auto_schema(
     #     operation_id='tags',
