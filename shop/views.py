@@ -11,7 +11,7 @@ from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
 from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
                           OrderShowSerializer, AdvertisingSerializer, ListSerializer, CartPostSerializer,
-                          PutSerializer)
+                          OrderPutSerializer, CartPutSerializer, PutSerializer)
 from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
 from rest_framework import viewsets, generics
 from drf_yasg.utils import swagger_auto_schema
@@ -160,7 +160,7 @@ class CartView(APIView):
 
     @swagger_auto_schema(
         operation_id='create_Cart',
-        operation_description="send 'product' = id product",
+        operation_description="send product id and amount ",
         request_body=CartPostSerializer(),
         responses={
             '200': CartSerializer()
@@ -173,10 +173,10 @@ class CartView(APIView):
                                                                 'user': request.user})
         med = Medicine.objects.get(id=request.data['product'])
         if serializer.is_valid():
-            cart = CartModel.objects.create(user=request.user, product=med)
+            cart = CartModel.objects.create(user=request.user, product=med, amount=request.data['amount'])
 
             # serializer.save()
-            serializer = CartSerializer(cart, context={'request': request, 'user': request.user})
+            serializer = CartSerializer(cart)
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
@@ -184,7 +184,7 @@ class CartView(APIView):
     @swagger_auto_schema(
         operation_id='update_Cart',
         operation_description="UpdateCart",
-        request_body=PutSerializer(),
+        request_body=CartPutSerializer(),
         responses={
             '200': CartSerializer()
         },
@@ -263,8 +263,8 @@ class OrderView(APIView):
 
     @swagger_auto_schema(
         operation_id='create_order_model',
-        operation_description="To change carts to order",
-        request_body=PutSerializer(),
+        operation_description="To add shipping address to order",
+        request_body=OrderPutSerializer(),
         responses={
             '200': OrderShowSerializer()
         },

@@ -51,7 +51,7 @@ class CartModel(models.Model):
 
     @property
     def get_total_price(self):
-        return self.product.cost * self.amount
+        return self.product.cost * self.amount - (self.product.discount * self.amount)
 
 
 PAYMENT_TYPES = (

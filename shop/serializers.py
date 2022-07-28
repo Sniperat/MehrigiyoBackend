@@ -76,10 +76,21 @@ class CartSerializer(serializers.ModelSerializer):
 
 class CartPostSerializer(serializers.Serializer):
     product = serializers.IntegerField()
+    amount = serializers.IntegerField()
 
 
 class PutSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+
+
+class CartPutSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField()
+
+
+class OrderPutSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    shipping_address = serializers.IntegerField()
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
