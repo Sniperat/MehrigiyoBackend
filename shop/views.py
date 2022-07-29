@@ -169,9 +169,14 @@ class CartView(APIView):
     )
     def post(self, request):
         print('asdasd')
-        serializer = CartSerializer(data=request.data, context={'request': request,
-                                                                'user': request.user})
         med = Medicine.objects.get(id=request.data['product'])
+        try:
+            serializer = CartModel.objects.get(user=request.user, status=1, product=med)
+            return ResponseSuccess(data='This product alredy in the cart', request=request.method)
+        except:
+            serializer = CartSerializer(data=request.data, context={'request': request,
+                                                                'user': request.user})
+        
         if serializer.is_valid():
             cart = CartModel.objects.create(user=request.user, product=med, amount=request.data['amount'])
 
