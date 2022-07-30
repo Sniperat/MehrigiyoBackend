@@ -46,7 +46,7 @@ class CartModel(models.Model):
     )
     user = models.ForeignKey('account.UserModel', on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(Medicine, on_delete=models.RESTRICT)
-    amount = models.IntegerField(default=1)
+    amount = models.IntegerField(default=1, null=True, blank=True)
     status = models.SmallIntegerField(default=1, choices=TYPE)
 
     @property

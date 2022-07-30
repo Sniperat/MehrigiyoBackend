@@ -244,14 +244,15 @@ class OrderView(APIView):
     @swagger_auto_schema(
         operation_id='create_cart_model',
         operation_description="To create cart model",
-        # request_body=OrderShowSerializer(),
+        request_body=ListSerializer(),
         responses={
             '200': OrderShowSerializer()
         },
 
     )
     def post(self, request):
-        carts = CartModel.objects.filter(user=request.user, status=1)
+        ides = request.data['list'].split(',')
+        carts = CartModel.objects.filter(user=request.user, status=1, id__in=ides)
         order = OrderModel()
         order.user = request.user
         order.save()
