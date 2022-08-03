@@ -97,6 +97,9 @@ class OrderModel(models.Model):
     def get_payme_amount(self):
         return self.price*100
 
+    def __str__(self):
+        return self.user.get_full_name()
+
 
 class Advertising(models.Model):
     image = models.ImageField(upload_to=f'medicine/advertising/', null=True, blank=True)
