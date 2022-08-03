@@ -120,5 +120,3 @@ class DeliveryAddress(models.Model):
     door_or_phone = models.CharField(max_length=255, null=True, blank=True)
     instructions = models.CharField(max_length=255, null=True, blank=True)
 
-    def __str__(self):
-        return self.name
