@@ -77,4 +77,8 @@ class MessageView(generics.ListAPIView):
                               type=openapi.TYPE_NUMBER)
         ], operation_description='get all messages with pagination')
     def get(self, request, *args, **kwargs):
+        key = request.GET.get('chat_id', False)
+        if key:
+            chr = ChatRoom.objects.get(id=key)
+            self.queryset = chr.messages.all
         return self.list(request, *args, **kwargs)

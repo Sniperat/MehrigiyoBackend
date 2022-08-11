@@ -1,13 +1,15 @@
 from rest_framework import serializers
 from .models import ChatRoom, Message
-
+from account.models import UserModel
 
 class MessageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         user = representation['owner']
-        if user.is_staff:
+        u = UserModel.objects.get(id=user)
+        print(user)
+        if u.is_staff:
             representation['doctor'] = True
         representation['doctor'] = False
         return representation
