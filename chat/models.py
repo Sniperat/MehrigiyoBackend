@@ -23,3 +23,9 @@ class ChatRoom(models.Model):
 
     def last_message(self):
         return self.messages.last()
+
+    def get_doctor_fullname(self):
+        return self.doktor.get_full_name()
+
+    def get_client_fullname(self):
+        return self.client.get_full_name()

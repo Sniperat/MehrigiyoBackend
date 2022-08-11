@@ -4,6 +4,14 @@ from .models import ChatRoom, Message
 
 class MessageSerializer(serializers.ModelSerializer):
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        user = representation['owner']
+        if user.is_staff:
+            representation['doctor'] = True
+        representation['doctor'] = False
+        return representation
+
     class Meta:
         model = Message
         fields = '__all__'
@@ -14,7 +22,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatRoom
-        fields = '__all__'
+        fields = ['id', 'get_doctor_fullname', 'get_client_fullname', 'created_at']
 
 
 class RoomsSerializer(serializers.ModelSerializer):

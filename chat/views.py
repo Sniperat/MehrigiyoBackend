@@ -3,10 +3,11 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 
 from account.models import UserModel
-from .models import ChatRoom
-from .serializers import ChatSerializer, RoomsSerializer
+from .models import ChatRoom, Message
+from .serializers import ChatSerializer, RoomsSerializer, MessageSerializer
 from specialist.models import Doctor
 from rest_framework.views import APIView
 from config.responses import ResponseFail, ResponseSuccess
@@ -60,3 +61,20 @@ class MyChatsView(APIView):
         serializer = RoomsSerializer(rooms, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
+
+class MessageView(generics.ListAPIView):
+    queryset = Message.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MessageSerializer
+
+    @swagger_auto_schema(
+        # request_body=DoctorSerializer(),
+        responses={
+            '200': MessageSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('chat_id', openapi.IN_QUERY, description="chat_id",
+                              type=openapi.TYPE_NUMBER)
+        ], operation_description='get all messages with pagination')
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
