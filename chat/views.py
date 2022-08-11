@@ -19,7 +19,7 @@ class ChatView(APIView):
             '200': ChatSerializer()
         },
         manual_parameters=[
-            openapi.Parameter('pk', openapi.IN_QUERY, description="doctor_id",
+            openapi.Parameter('pk', openapi.IN_QUERY, description="pk",
                               type=openapi.TYPE_NUMBER)
         ], operation_description='GET News')
     @action(detail=False, methods=['get'])

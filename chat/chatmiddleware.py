@@ -18,19 +18,24 @@ def get_user(token_key):
         user = UserModel.objects.get(id=decoded_data["user_id"])
     return user
 
-
+from urllib.parse import parse_qs
 class TokenAuthMiddleware:
 
     def __init__(self, inner):
         self.inner = inner
 
     async def __call__(self, scope, receive, send):
-        headers = dict(scope['headers'])
-        if b'authorization' in headers:
+        # print(scope['path'])
+        # print(receive)
+        # print(send)
+        # query_params = parse_qs(scope["query_string"].decode())
+        # print(query_params["token"][-1])
+        scope = dict(scope)
 
-            token_name, token_key = headers[b'authorization'].decode().split()
-            if token_name == 'Bearer':
-                scope['user'] = await get_user(token_key)
+        token_key = parse_qs(scope["query_string"].decode())['token'][0].replace('${', '').replace('}', '')
+        headers = dict(scope['headers'])
+
+        scope['user'] = await get_user(token_key)
 
         return await self.inner(scope, receive, send)
 
