@@ -32,7 +32,7 @@ class TokenAuthMiddleware:
         # print(query_params["token"][-1])
         scope = dict(scope)
 
-        token_key = parse_qs(scope["query_string"].decode())['token'][0])
+        token_key = parse_qs(scope["query_string"].decode())['token'][0]
         headers = dict(scope['headers'])
 
         scope['user'] = await get_user(token_key)
