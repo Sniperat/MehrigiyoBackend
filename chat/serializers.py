@@ -29,6 +29,14 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class RoomsSerializer(serializers.ModelSerializer):
     last_message = MessageSerializer()
+    doktor = serializers.SerializerMethodField(method_name='get_name')
+    client = serializers.SerializerMethodField(method_name='get_cname')
+
+    def get_name(self, obj):
+        return obj.doktor.get_full_name()
+
+    def get_cname(self, obj):
+        return obj.client.get_full_name()
 
     class Meta:
         model = ChatRoom

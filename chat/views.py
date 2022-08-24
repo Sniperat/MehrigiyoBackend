@@ -80,5 +80,5 @@ class MessageView(generics.ListAPIView):
         key = request.GET.get('chat_id', False)
         if key:
             chr = ChatRoom.objects.get(id=key)
-            self.queryset = chr.messages.all()
+            self.queryset = chr.messages.all().order_by('-id')
         return self.list(request, *args, **kwargs)
