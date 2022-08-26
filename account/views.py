@@ -132,6 +132,8 @@ class RegionView(APIView):
             reg = RegionModel.objects.filter(country_id=key)
             serializer = RegionSerializer(reg, many=True)
             return ResponseSuccess(data=serializer.data, request=request.method)
+        else:
+            return ResponseFail(data='country_id is not send ')
 
 
 class CountryView(APIView):
