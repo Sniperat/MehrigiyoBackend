@@ -31,3 +31,10 @@ class CommentDoctor(models.Model):
             UniqueConstraint(fields=['doctor', 'user'], name='rate_doc')
         ]
 
+
+class QuestionModel(models.Model):
+    full_name = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    question = models.CharField(max_length=255)
+    answer = models.BooleanField(default=False)

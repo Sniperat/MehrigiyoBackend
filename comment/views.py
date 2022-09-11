@@ -9,7 +9,7 @@ from config.responses import ResponseSuccess, ResponseFail
 from shop.models import Medicine
 from specialist.models import Doctor
 from .models import CommentDoctor, CommentMedicine
-from .serializers import CommentDoctorSerializer, CommentMedicineSerializer, CommentPostSerializer
+from .serializers import CommentDoctorSerializer, CommentMedicineSerializer, CommentPostSerializer, QuestionSerializer
 
 
 class CommentDoctorView(APIView):
@@ -100,6 +100,16 @@ class CommentMedicineView(APIView):
         return ResponseFail(data=serializer.errors, request=request.method)
 
 
-
-
-
+class QuestionView(APIView):
+    @swagger_auto_schema(
+        operation_id='question',
+        operation_description="Send Question",
+        request_body=QuestionSerializer(),
+    )
+    def post(self, request):
+        serializer = QuestionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return ResponseSuccess(data='Success')
+        else:
+            return ResponseFail(data=serializer.errors)

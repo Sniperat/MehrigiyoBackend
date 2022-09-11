@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from comment.models import CommentDoctor, CommentMedicine
+from comment.models import CommentDoctor, CommentMedicine, QuestionModel
 
 
 class CommentDoctorSerializer(serializers.ModelSerializer):
@@ -27,3 +27,10 @@ class CommentPostSerializer(serializers.Serializer):
     pk = serializers.IntegerField(required=True)
     text = serializers.CharField(max_length=500, required=False)
     rate = serializers.IntegerField(max_value=5, required=False, default=1)
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QuestionModel
+        fields = '__all__'
