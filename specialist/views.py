@@ -14,7 +14,7 @@ import datetime
 import pytz
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer, AdvertisingSerializer
+from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer, AdvertisingSerializer, AdviceSerializer
 from .models import Doctor, TypeDoctor, AdviceTime, Advertising
 from .filters import DoctorFilter
 
@@ -162,23 +162,47 @@ class RateView(APIView):
 class AdviceView(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        operation_id='get_advice_times',
+        operation_description="get_advice_times",
+        # request_body=DoctorSerializer(),
+        responses={
+            '200': AdviceSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('date', openapi.IN_QUERY, description="%d/%m/%y %H:%M:%S", type=openapi.TYPE_STRING),
+            openapi.Parameter('my', openapi.IN_QUERY, description="all clients time", type=openapi.TYPE_BOOLEAN)
+        ]
+    )
     def get(self, request, pk):
-        advice = AdviceTime.objects.filter(doctor_id=pk)
-        data_now = datetime.datetime.now()
-        data_times = []
-        for i in advice:
-            # if i.start_time >= data_now:
-            data_times.append(i.start_time)
-        return ResponseSuccess(data=data_times)
+        date_own = request.GET.get('date', False)
+        my = request.GET.get('my', False)
+
+        date_obj = datetime.datetime.strptime(date_own, '%d/%m/%y %H:%M:%S')
+
+        if my:
+            advice = AdviceTime.objects.filter(doctor_id=pk,
+                                               client=request.user,
+                                               start_time__day=date_obj.day,
+                                               start_time__month=date_obj.month)
+        else:
+            advice = AdviceTime.objects.filter(doctor_id=pk,
+                                               start_time__day=date_obj.day,
+                                               start_time__month=date_obj.month)
+
+        ser = AdviceSerializer(advice, many=True)
+        return ResponseSuccess(data=ser.data)
 
     def post(self, request, pk):
-        date_time_input = request.data['datatime']
+        date_time_start = request.data['start_time']
+        date_time_end = request.data['end_time']
 
-        date_time_obj = datetime.datetime.strptime(date_time_input, '%d/%m/%y %H:%M:%S')
+        date_time_start_obj = datetime.datetime.strptime(date_time_start, '%d/%m/%y %H:%M:%S')
+        date_time_end_obj = datetime.datetime.strptime(date_time_end, '%d/%m/%y %H:%M:%S')
 
         advice = None
         try:
-            advice = AdviceTime.objects.get(start_time=date_time_obj)
+            advice = AdviceTime.objects.get(start_time=date_time_start_obj, end_time=date_time_end_obj)
         except:
             pass
         if advice is not None:
@@ -186,6 +210,7 @@ class AdviceView(APIView):
         advice = AdviceTime()
         advice.client = request.user
         advice.doctor = Doctor.objects.get(id=pk)
-        advice.start_time = date_time_obj
+        advice.start_time = date_time_start_obj
+        advice.end_time = date_time_end_obj
         advice.save()
         return ResponseSuccess()

@@ -16,7 +16,8 @@ class Message(models.Model):
 
 
 class ChatRoom(models.Model):
-    client = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_client')
+    admin = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_admin', null=True, blank=True)
+    client = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_client', null=True, blank=True)
     doktor = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_doctor')
     messages = models.ManyToManyField(Message, related_name='words')
     created_at = models.DateTimeField(auto_now_add=True)

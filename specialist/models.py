@@ -43,6 +43,8 @@ class AdviceTime(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT)
     client = models.ForeignKey('account.UserModel', on_delete=models.RESTRICT)
     start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    status = models.BooleanField(default=True)
 
 
 class Advertising(models.Model):

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (SendSmsView, ConfirmSmsView, RegistrationView, CountryView, RegionView, AddAddressView,
-                    UserView, MedicineView, DoctorView, DeliverAddressView)
+                    UserView, MedicineView, DoctorView, DeliverAddressView, OfferView)
 urlpatterns = [
     path('send/sms/', SendSmsView.as_view()),
     path('send/sms/confirm/', ConfirmSmsView.as_view()),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('favorite/medicines/', MedicineView.as_view()),
     path('favorite/doctors/', DoctorView.as_view()),
     path('deliver/address/', DeliverAddressView.as_view()),
+    path('offer/', OfferView.as_view()),
 
 ]
 

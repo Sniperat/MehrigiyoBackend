@@ -2,8 +2,16 @@ from django.db.models import Sum
 from rest_framework import serializers
 
 from account.models import UserModel
-from .models import Doctor, TypeDoctor, RateDoctor, Advertising
+from .models import Doctor, TypeDoctor, RateDoctor, Advertising, AdviceTime
 from comment.models import CommentDoctor
+
+
+class AdviceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AdviceTime
+        fields = '__all__'
+
 
 class AdvertisingSerializer(serializers.ModelSerializer):
 

@@ -1,10 +1,18 @@
 from rest_framework import serializers
-from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
+from .models import UserModel, CountyModel, RegionModel, DeliveryAddress, OfferModel
 from config.validators import PhoneValidator
+
+
+class OfferSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OfferModel
+        fields = '__all__'
 
 
 class PkSerializer(serializers.Serializer):
     pk = serializers.IntegerField(required=True)
+
 
 class RegionPostSerializer(serializers.Serializer):
     region = serializers.IntegerField(required=True)

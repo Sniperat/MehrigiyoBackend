@@ -13,7 +13,7 @@ from config.helpers import send_sms_code, validate_sms_code
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
                           RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer, PkSerializer,
-                          RegionPostSerializer)
+                          RegionPostSerializer, OfferSerializer)
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 
@@ -25,11 +25,17 @@ class SendSmsView(APIView):
         responses={
             '200': SmsSerializer()
         },
+        manual_parameters=[
+            openapi.Parameter('link', openapi.IN_QUERY, description="for link",
+                              type=openapi.TYPE_BOOLEAN)
+        ],
     )
     def post(self, request):
+        link = request.GET.get('link', False)
+
         serializer = SmsSerializer(data=request.data)
         if serializer.is_valid():
-            send_sms_code(request, serializer.data['phone'])
+            send_sms_code(request, serializer.data['phone'], link)
             return ResponseSuccess(request=request.method)
         return ResponseFail(data=serializer.errors, request=request.method)
 
@@ -338,3 +344,21 @@ class DeliverAddressView(generics.ListAPIView, APIView):
             return ResponseSuccess(data=serializers.data, request=request.method)
         else:
             return ResponseFail(data=serializers.errors, request=request.method)
+
+
+class OfferView(APIView):
+    @swagger_auto_schema(
+        operation_id='create_offer',
+        operation_description="Create Offer",
+        request_body=OfferSerializer(),
+        responses={
+            '200': OfferSerializer()
+        },
+    )
+    def post(self, request):
+        serializer = OfferSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return ResponseSuccess(data=serializer.data)
+        else:
+            return ResponseFail(data=serializer.errors)

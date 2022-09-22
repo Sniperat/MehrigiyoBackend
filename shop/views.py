@@ -18,6 +18,11 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from specialist.models import Doctor
+from specialist.serializers import DoctorSerializer
+from news.models import NewsModel
+from news.serializers import NewsModelSerializer
+
 
 class AdvertisingShopView(generics.ListAPIView):
     queryset = Advertising.objects.all()
@@ -314,3 +319,50 @@ class OrderView(APIView):
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
+
+
+class SearchView(APIView):
+    @swagger_auto_schema(
+        operation_id='search',
+        operation_description="Search",
+        # request_body=RoomsSerializer(),
+        manual_parameters=[
+            openapi.Parameter('key', openapi.IN_QUERY, description="write key",
+                              type=openapi.TYPE_STRING),
+            openapi.Parameter('medicines', openapi.IN_QUERY, description="medicines",
+                              type=openapi.TYPE_BOOLEAN),
+            openapi.Parameter('doctors', openapi.IN_QUERY, description="doctors",
+                              type=openapi.TYPE_BOOLEAN),
+            openapi.Parameter('news', openapi.IN_QUERY, description="news",
+                              type=openapi.TYPE_BOOLEAN)
+        ]
+    )
+    def get(self, request):
+        key = request.data.get('key', False)
+        medicines = request.data.get('medicines', False)
+        doctors = request.data.get('doctors', False)
+        news = request.data.get('news', False)
+
+        data = {}
+        if key:
+            if medicines:
+                med = []
+                med.extend(Medicine.objects.filter(name__contains=key))
+                med.extend(Medicine.objects.filter(type_medicine__name__contains=key))
+                med.extend(Medicine.objects.filter(title__contains=key))
+                med_ser = MedicineSerializer(med, many=True)
+                data['medicines'] = med_ser.data
+            if doctors:
+                doc = []
+                doc.extend(Doctor.objects.filter(full_name__contains=key))
+                doc.extend(Doctor.objects.filter(type_doctor__name__contains=key))
+                doc_ser = DoctorSerializer(doc, many=True)
+                data['doctors'] = doc_ser
+            if news:
+                new = []
+                new.extend(NewsModel.objects.filter(name__contains=key))
+                new.extend(NewsModel.objects.filter(description=key))
+                new_ser = NewsModelSerializer(new, many=True)
+                data['news'] = new_ser.data
+
+        return ResponseSuccess(data=data)

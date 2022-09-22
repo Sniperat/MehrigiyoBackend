@@ -13,31 +13,34 @@ def sms_code():
     return str(random.randint(100000, 999999))
 
 
-def send_sms_code(request, phone):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
+def send_sms_code(request, phone, send_link):
+    if send_link:
+        send_sms(phone, "link")
     else:
-        ip = request.META.get('REMOTE_ADDR')
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
 
-    ip_count = SmsCode.objects.filter(ip=ip).count()
-    if ip_count > 1000:
-        raise SuspiciousOperation("Over limit")
+        ip_count = SmsCode.objects.filter(ip=ip).count()
+        if ip_count > 1000:
+            raise SuspiciousOperation("Over limit")
 
-    phone_count = SmsCode.objects.filter(phone=phone).count()
-    if phone_count > 1000:
-        raise SuspiciousOperation("Over limit")
+        phone_count = SmsCode.objects.filter(phone=phone).count()
+        if phone_count > 1000:
+            raise SuspiciousOperation("Over limit")
 
-    code = sms_code()
+        code = sms_code()
 
-    model = SmsCode()
-    model.ip = ip
-    model.phone = phone
-    model.code = code
-    model.expire_at = datetime.now() + timedelta(minutes=10)
-    model.save()
+        model = SmsCode()
+        model.ip = ip
+        model.phone = phone
+        model.code = code
+        model.expire_at = datetime.now() + timedelta(minutes=10)
+        model.save()
 
-    send_sms(phone, "Tasdiqlash kodi " + code)
+        send_sms(phone, "Tasdiqlash kodi " + code)
     return code
 
 

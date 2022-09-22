@@ -120,3 +120,9 @@ class DeliveryAddress(models.Model):
     door_or_phone = models.CharField(max_length=255, null=True, blank=True)
     instructions = models.CharField(max_length=255, null=True, blank=True)
 
+
+class OfferModel(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15)
+    offer = models.TextField()

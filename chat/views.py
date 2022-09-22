@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -5,10 +7,11 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
-from account.models import UserModel
+from account.models import UserModel, OfferModel
+from account.serializers import OfferSerializer
 from .models import ChatRoom, Message
 from .serializers import ChatSerializer, RoomsSerializer, MessageSerializer
-from specialist.models import Doctor
+from specialist.models import Doctor, AdviceTime
 from rest_framework.views import APIView
 from config.responses import ResponseFail, ResponseSuccess
 
@@ -21,11 +24,28 @@ class ChatView(APIView):
         },
         manual_parameters=[
             openapi.Parameter('pk', openapi.IN_QUERY, description="pk",
-                              type=openapi.TYPE_NUMBER)
+                              type=openapi.TYPE_NUMBER),
+            openapi.Parameter('admin', openapi.IN_QUERY, description="chat with admin",
+                              type=openapi.TYPE_BOOLEAN)
         ], operation_description='GET News')
     @action(detail=False, methods=['get'])
     def get(self, request):
         key = request.GET.get('pk', False)
+        admin = request.GET.get('admin', False)
+        if admin:
+            user = UserModel.objects.filter(is_superuser=True).first()
+            try:
+                room = ChatRoom.objects.get(client=request.user, admin=user)
+            except:
+                room = None
+            if room is None:
+                room = ChatRoom()
+                room.client = request.user
+                room.admin = user
+                room.save()
+
+            serializer = ChatSerializer(room)
+            return ResponseSuccess(data=serializer.data, request=request.method)
         if key:
             doctor = Doctor.objects.get(id=key)
             user = UserModel.objects.get(specialist_doctor=doctor, is_staff=True)
@@ -58,7 +78,9 @@ class MyChatsView(APIView):
     def get(self, request):
 
         rooms = ChatRoom.objects.filter(client=request.user)
+        ad = AdviceTime.objects.filter(client=request.user, start_time__gte=datetime.datetime.now()).first()
         serializer = RoomsSerializer(rooms, many=True)
+        serializer.data['start_chat'] = ad.start_time
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
