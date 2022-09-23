@@ -338,10 +338,10 @@ class SearchView(APIView):
         ]
     )
     def get(self, request):
-        key = request.data.get('key', False)
-        medicines = request.data.get('medicines', False)
-        doctors = request.data.get('doctors', False)
-        news = request.data.get('news', False)
+        key = request.GET.get('key', False)
+        medicines = request.GET.get('medicines', False)
+        doctors = request.GET.get('doctors', False)
+        news = request.GET.get('news', False)
 
         data = {}
         if key:
@@ -361,7 +361,7 @@ class SearchView(APIView):
             if news:
                 new = []
                 new.extend(NewsModel.objects.filter(name__contains=key))
-                new.extend(NewsModel.objects.filter(description=key))
+                new.extend(NewsModel.objects.filter(description__contains=key))
                 new_ser = NewsModelSerializer(new, many=True)
                 data['news'] = new_ser.data
 
