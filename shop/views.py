@@ -357,7 +357,7 @@ class SearchView(APIView):
                 doc.extend(Doctor.objects.filter(full_name__contains=key))
                 doc.extend(Doctor.objects.filter(type_doctor__name__contains=key))
                 doc_ser = DoctorSerializer(doc, many=True)
-                data['doctors'] = doc_ser
+                data['doctors'] = doc_ser.data
             if news:
                 new = []
                 new.extend(NewsModel.objects.filter(name__contains=key))
