@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
+from .models import UserModel, CountyModel, RegionModel, DeliveryAddress, OfferModel
 from modeltranslation.admin import TabbedTranslationAdmin
 from django.contrib.auth.admin import UserAdmin
 
@@ -39,4 +39,5 @@ admin.site.register(UserModel, CustomUserAdmin)
 admin.site.register(CountyModel, CountryAdmin)
 admin.site.register(RegionModel, RegionAdmin)
 admin.site.register(DeliveryAddress)
+admin.site.register(OfferModel)
 

@@ -16,6 +16,7 @@ def sms_code():
 def send_sms_code(request, phone, send_link):
     if send_link:
         send_sms(phone, "link")
+        return 0
     else:
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
@@ -41,7 +42,7 @@ def send_sms_code(request, phone, send_link):
         model.save()
 
         send_sms(phone, "Tasdiqlash kodi " + code)
-    return code
+        return code
 
 
 def validate_sms_code(phone, code):

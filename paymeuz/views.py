@@ -115,28 +115,28 @@ class CardView(APIView):
             return ResponseFail()
 
 
-class CardGetVerifyCodeView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    @swagger_auto_schema(
-        operation_id='send_verify_card',
-        operation_description="Send verify card data",
-        request_body=CardSendConfirmSerializer(),
-        # responses={
-        #     '200': CardSerializer()
-        # },
-    )
-    def post(self, request):
-        card = Card.objects.get(id=request.data['card_id'])
-        data = cards_get_verify_code(token=card.token)
-        print(data)
-        try:
-            code = data['error']['code']
-            if code == SYSTEM_ERROR:
-                SYSTEM_ERROR_MESSAGE['token'] = data['token']
-                return ResponseFail(data=SYSTEM_ERROR_MESSAGE)
-        except:
-            return ResponseSuccess(data=data)
+# class CardGetVerifyCodeView(APIView):
+#     permission_classes = (IsAuthenticated,)
+#
+#     @swagger_auto_schema(
+#         operation_id='send_verify_card',
+#         operation_description="Send verify card data",
+#         request_body=CardSendConfirmSerializer(),
+#         # responses={
+#         #     '200': CardSerializer()
+#         # },
+#     )
+#     def post(self, request):
+#         card = Card.objects.get(id=request.data['card_id'])
+#         data = cards_get_verify_code(token=card.token)
+#         print(data)
+#         try:
+#             code = data['error']['code']
+#             if code == SYSTEM_ERROR:
+#                 SYSTEM_ERROR_MESSAGE['token'] = data['token']
+#                 return ResponseFail(data=SYSTEM_ERROR_MESSAGE)
+#         except:
+#             return ResponseSuccess(data=data)
         # data = cards_get_verify_code(token=request.data['token'])
         # return ResponseSuccess(data=data)
 
