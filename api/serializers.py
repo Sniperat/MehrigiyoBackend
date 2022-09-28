@@ -27,6 +27,7 @@ class CountryModelAdminSerializer(serializers.ModelSerializer):
 
 
 class RegionModelAdminSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
     class Meta:
         model = RegionModel
         fields = '__all__'

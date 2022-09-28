@@ -179,6 +179,18 @@ class AddAddressView(APIView):
         return ResponseFail(data='Bunday Viloyat mavjud emas', request=request.method)
 
     @swagger_auto_schema(
+        request_body=RegionSerializer(),
+        )
+    @action(detail=False, methods=['put'])
+    def put(self, request):
+        reg = RegionModel.objects.get(id=request.GET['id'])
+        ser = RegionSerializer(reg, data=request.data, partial=True)
+        if ser.is_valid():
+            ser.save()
+            return ResponseSuccess(ser.data)
+        else:
+            return ResponseFail(data=ser.errors)
+    @swagger_auto_schema(
         # request_body=DoctorSerializer(),
         manual_parameters=[
             openapi.Parameter('pk', openapi.IN_QUERY, description="Delivery address",

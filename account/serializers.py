@@ -54,6 +54,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class RegionSerializer(serializers.ModelSerializer):
     # country = CountrySerializer()
+    id = serializers.ReadOnlyField()
 
     class Meta:
         model = RegionModel
