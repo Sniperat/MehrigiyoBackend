@@ -18,6 +18,11 @@ class RegionPostSerializer(serializers.Serializer):
     region = serializers.IntegerField(required=True)
 
 
+class RegionPutSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True)
+    region = serializers.IntegerField(required=True)
+
+
 class SmsSerializer(serializers.Serializer):
     phone = serializers.CharField(validators=[PhoneValidator()])
 

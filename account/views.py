@@ -13,7 +13,7 @@ from config.helpers import send_sms_code, validate_sms_code
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
                           RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer, PkSerializer,
-                          RegionPostSerializer, OfferSerializer)
+                          RegionPostSerializer, OfferSerializer, RegionPutSerializer)
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 
@@ -356,6 +356,35 @@ class DeliverAddressView(generics.ListAPIView, APIView):
             return ResponseSuccess(data=serializers.data, request=request.method)
         else:
             return ResponseFail(data=serializers.errors, request=request.method)
+
+    @swagger_auto_schema(
+        operation_id='update_delivery_address',
+        operation_description="update_delivery_address",
+        request_body=RegionPutSerializer(),
+        responses={
+            '200': DeliverAddressSerializer()
+        },
+    )
+    def put(self, request):
+        add = DeliveryAddress.objects.get(id=request.data["id"])
+        region = RegionModel.objects.get(id=request.data["region"])
+        add.region = region
+        add.save()
+        return ResponseSuccess(data='Update!')
+
+    @swagger_auto_schema(
+        operation_id='delete_delivery_address',
+        operation_description="delete_delivery_address",
+        request_body=PkSerializer(),
+    )
+    def delete(self, request):
+        try:
+            DeliveryAddress.objects.get(id=request.data["pk"]).delete()
+            return ResponseSuccess(data='delete!')
+        except:
+            return ResponseFail(data='delivery address not found')
+
+
 
 
 class OfferView(APIView):
