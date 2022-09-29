@@ -338,7 +338,7 @@ class DeliverAddressView(generics.ListAPIView, APIView):
     @swagger_auto_schema(
         operation_id='add_delivery_address',
         operation_description="add_delivery_address",
-        request_body=RegionPostSerializer(),
+        request_body=DeliverAddressSerializer(),
         responses={
             '200': DeliverAddressSerializer()
         },
@@ -360,17 +360,31 @@ class DeliverAddressView(generics.ListAPIView, APIView):
     @swagger_auto_schema(
         operation_id='update_delivery_address',
         operation_description="update_delivery_address",
-        request_body=RegionPutSerializer(),
+        request_body=DeliverAddressSerializer(),
         responses={
             '200': DeliverAddressSerializer()
         },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="Delivery address Id",
+                              type=openapi.TYPE_NUMBER)
+        ]
     )
     def put(self, request):
-        add = DeliveryAddress.objects.get(id=request.data["id"])
-        region = RegionModel.objects.get(id=request.data["region"])
-        add.region = region
-        add.save()
-        return ResponseSuccess(data='Update!')
+        key = request.GET.get('pk', False)
+        add = DeliveryAddress.objects.get(id=key)
+        try:
+            region = RegionModel.objects.get(id=request.data["region"])
+            add.region = region
+        except:
+            pass
+        del request.data["region"]
+        serializers = DeliverAddressSerializer(add, data=request.data, partial=True)
+        if serializers.is_valid():
+            serializers.save()
+            return ResponseSuccess(data=serializers.data)
+        else:
+            return ResponseFail(data=serializers.errors)
+
 
     @swagger_auto_schema(
         operation_id='delete_delivery_address',
