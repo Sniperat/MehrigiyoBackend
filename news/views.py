@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import NewsModelSerializer, TagsSerializer, InputSerializer, TagsWithNewsSerializer
-from .models import NewsModel, TagsModel
+from .serializers import NewsModelSerializer, TagsSerializer, AdvertisingSerializer
+from .models import NewsModel, TagsModel, Advertising
 from .filters import NewsFilter
 
 
@@ -83,3 +83,21 @@ class TagView(APIView):
     # def post(self, request, *args, **kwargs):
     #     self.queryset = TagsModel.objects.filter(tag_name=request.data['tag'])
     #     return self.list(request, *args, **kwargs)
+
+
+class AdvertisingShopView(generics.ListAPIView):
+    queryset = Advertising.objects.all()
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = AdvertisingSerializer
+    # pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
+
+    @swagger_auto_schema(
+        operation_id='advertising',
+        operation_description="advertisingView",
+        # request_body=AdvertisingSerializer(),
+        responses={
+            '200': AdvertisingSerializer()
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)

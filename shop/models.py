@@ -2,6 +2,7 @@ from django.db import models
 import datetime
 from django.urls import reverse_lazy
 # from django.utils.translation import gettext as _
+from specialist.models import Doctor
 
 today = datetime.date.today()
 
@@ -100,10 +101,4 @@ class OrderModel(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
-
-class Advertising(models.Model):
-    image = models.ImageField(upload_to=f'medicine/advertising/', null=True, blank=True)
-    title = models.CharField(max_length=255)
-    text = models.TextField()
-    medicine = models.ForeignKey(Medicine, on_delete=models.RESTRICT, null=True, blank=True)
 

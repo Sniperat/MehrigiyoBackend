@@ -10,9 +10,9 @@ from .filters import ProductFilter
 from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
 from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
-                          OrderShowSerializer, AdvertisingSerializer, ListSerializer, CartPostSerializer,
+                          OrderShowSerializer, ListSerializer, CartPostSerializer,
                           OrderPutSerializer, CartPutSerializer, PutSerializer)
-from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel, Advertising
+from .models import PicturesMedicine, TypeMedicine, Medicine, CartModel, OrderModel
 from rest_framework import viewsets, generics
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.mixins import ListModelMixin
@@ -24,22 +24,7 @@ from news.models import NewsModel
 from news.serializers import NewsModelSerializer
 
 
-class AdvertisingShopView(generics.ListAPIView):
-    queryset = Advertising.objects.all()
-    # permission_classes = (IsAuthenticated,)
-    serializer_class = AdvertisingSerializer
-    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
-    @swagger_auto_schema(
-        operation_id='advertising',
-        operation_description="advertisingView",
-        # request_body=AdvertisingSerializer(),
-        responses={
-            '200': AdvertisingSerializer()
-        },
-    )
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
 
 class TypeMedicineView(viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):

@@ -1,5 +1,13 @@
 from rest_framework.serializers import ModelSerializer, Serializer, CharField
-from .models import NewsModel, TagsModel
+from .models import NewsModel, TagsModel, Advertising
+
+
+class AdvertisingSerializer(ModelSerializer):
+
+    class Meta:
+        model = Advertising
+        fields = '__all__'
+        ref_name = "Shop_ad"
 
 
 class TagsSerializer(ModelSerializer):

@@ -1,5 +1,7 @@
 from django.db import models
 import datetime
+from specialist.models import Doctor
+from shop.models import Medicine
 # from django.utils.translation import gettext as _
 
 today = datetime.date.today()
@@ -25,3 +27,18 @@ class TagsModel(models.Model):
 
     # def get_news(self):
     #     return NewsModel.objects.filter(hashtag__tag_name=self.tag_name)
+
+
+class Advertising(models.Model):
+    image = models.ImageField(upload_to=f'medicine/advertising/', null=True, blank=True)
+    title = models.CharField(max_length=255)
+    text = models.TextField()
+    medicine = models.ForeignKey(Medicine, on_delete=models.RESTRICT, null=True, blank=True,
+                                 related_name='special_news_med')
+    doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT, null=True, blank=True,
+                               related_name='special_news_doc')
+    type = models.SmallIntegerField(choices=(
+        (1, 'medicines'),
+        (2, 'doctors')
+    ), default=1, db_index=True)
+

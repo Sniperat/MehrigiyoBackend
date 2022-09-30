@@ -2,13 +2,12 @@ from django.urls import path, include, re_path
 from rest_framework import routers
 
 from .views import (MedicinesView, TypeMedicineView, GetMedicinesWithType, GetSingleMedicine, CartView,
-                    OrderView, AdvertisingShopView, SearchView)
+                    OrderView, SearchView)
 router = routers.DefaultRouter()
 router.register(r'types', TypeMedicineView)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('advertising/', AdvertisingShopView.as_view()),
 
     # path('types/', TypeMedicineView.as_view()),
     # path('types/one/', GetMedicinesWithType.as_view()),

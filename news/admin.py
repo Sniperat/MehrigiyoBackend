@@ -1,6 +1,6 @@
 from django.contrib import admin
 from modeltranslation.admin import TabbedTranslationAdmin
-from .models import NewsModel, TagsModel
+from .models import NewsModel, TagsModel, Advertising
 
 
 class NewsAdmin(TabbedTranslationAdmin):
@@ -13,4 +13,6 @@ class TagsAdmin(TabbedTranslationAdmin):
 
 admin.site.register(NewsModel, NewsAdmin)
 admin.site.register(TagsModel, TagsAdmin)
+admin.site.register(Advertising)
+
 
