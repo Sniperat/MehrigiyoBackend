@@ -59,7 +59,7 @@ class CommentDoctorView(APIView):
 
 
 class CommentMedicineView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         # request_body=DoctorSerializer(),
@@ -74,7 +74,7 @@ class CommentMedicineView(APIView):
     def get(self, request):
         key = request.GET.get('pk', False)
         if key:
-            comment = CommentMedicine.objects.filter(medicine_id=pk)
+            comment = CommentMedicine.objects.filter(medicine_id=key)
             serializer = CommentMedicineSerializer(comment, many=True)
             return ResponseSuccess(data=serializer.data, request=request.method)
 
