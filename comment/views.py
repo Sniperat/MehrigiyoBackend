@@ -59,7 +59,7 @@ class CommentDoctorView(APIView):
 
 
 class CommentMedicineView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         # request_body=DoctorSerializer(),
