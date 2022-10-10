@@ -82,6 +82,7 @@ class SmsCode(models.Model):
     ip = models.GenericIPAddressField(db_index=True)
     code = models.CharField(max_length=10)
     expire_at = models.DateTimeField(db_index=True)
+    confirmed = models.BooleanField(default=False)
 
     class Meta:
         index_together = []

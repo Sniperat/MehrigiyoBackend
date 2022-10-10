@@ -62,6 +62,8 @@ def validate_sms_code(phone, code):
 
     for row in codes:
         if row.code == code:
+            row.confirmed = True
+            row.save()
             return True
 
     return False

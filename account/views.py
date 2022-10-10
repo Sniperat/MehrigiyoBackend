@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
+from .models import UserModel, CountyModel, RegionModel, DeliveryAddress, SmsCode
 from shop.models import Medicine
 from shop.serializers import MedicineSerializer
 from specialist.models import Doctor
@@ -13,7 +13,7 @@ from config.helpers import send_sms_code, validate_sms_code
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
                           RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer, PkSerializer,
-                          RegionPostSerializer, OfferSerializer, RegionPutSerializer)
+                          RegionPostSerializer, OfferSerializer, RegionPutSerializer, ChangePasswordSerializer)
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 
@@ -75,17 +75,54 @@ class RegistrationView(APIView):
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            access_token = AccessToken().for_user(user)
-            refresh_token = RefreshToken().for_user(user)
+            numbers = SmsCode.objects.filter(confirmed=True)
+            access = False
+            for i in numbers:
+                if serializer.data['username'] == i.phone:
+                    access = True
+                    i.confirmed = False
+                    i.save()
+            if access:
+                user = serializer.save()
+                access_token = AccessToken().for_user(user)
+                refresh_token = RefreshToken().for_user(user)
 
-            return ResponseSuccess(data={
-                "refresh": str(refresh_token),
-                "access": str(access_token),
-                **serializer.data
-            }, request=request.method)
+                return ResponseSuccess(data={
+                    "refresh": str(refresh_token),
+                    "access": str(access_token),
+                    **serializer.data
+                }, request=request.method)
+            else:
+                return ResponseFail(data='Ushbu raqam sms tekshiruvidan o\'tmagan')
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
+
+
+class ChangePassword(APIView):
+    @swagger_auto_schema(
+        operation_id='change_password',
+        operation_description="Password change",
+        request_body=ChangePasswordSerializer(),
+    )
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            numbers = SmsCode.objects.filter(confirmed=True)
+            access = False
+            for i in numbers:
+                if serializer.data['phone'] == i.phone:
+                    access = True
+                    i.confirmed = False
+                    i.save()
+            if access:
+                user = UserModel.objects.get(username=serializer.data['phone'])
+                user.set_password(serializer.data['new_password'])
+                user.save()
+                return ResponseSuccess()
+            else:
+                return ResponseFail(data='Ushbu raqam sms tekshiruvidan o\'tmagan')
+        else:
+            return ResponseFail(data=serializer.errors)
 
 
 class UserView(generics.ListAPIView, generics.UpdateAPIView):

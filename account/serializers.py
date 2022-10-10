@@ -32,6 +32,11 @@ class ConfirmSmsSerializer(serializers.Serializer):
     code = serializers.CharField(min_length=6, max_length=6)
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=50, min_length=6)
+    new_password = serializers.CharField(max_length=50, min_length=6)
+
+
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
