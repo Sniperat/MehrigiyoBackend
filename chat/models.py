@@ -1,7 +1,12 @@
+import random
+import string
+
 from django.db import models
 from account.models import UserModel
 import datetime
 today = datetime.date.today()
+letters = string.ascii_letters
+result_str = ''.join(random.choice(letters) for i in range(20))
 
 
 class Message(models.Model):
@@ -20,6 +25,7 @@ class ChatRoom(models.Model):
     client = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_client', null=True, blank=True)
     doktor = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_doctor')
     messages = models.ManyToManyField(Message, related_name='words')
+    token = models.CharField(max_length=255, default=result_str)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def last_message(self):

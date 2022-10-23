@@ -84,6 +84,7 @@ class CartPutSerializer(serializers.Serializer):
 class OrderPutSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     shipping_address = serializers.IntegerField()
+    credit_card = serializers.IntegerField()
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):

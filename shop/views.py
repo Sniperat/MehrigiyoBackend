@@ -268,6 +268,10 @@ class OrderView(APIView):
     )
     def put(self, request):
         try:
+            cart = CartModel.objects.get(id=request.data['card'])
+        except:
+            return ResponseFail(data='Order not found')
+        try:
             order = OrderModel.objects.get(id=request.data['id'])
         except:
             return ResponseFail(data='Order not found')
