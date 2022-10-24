@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
+
+from paymeuz.models import Card
 from .filters import ProductFilter
 from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
@@ -268,9 +270,9 @@ class OrderView(APIView):
     )
     def put(self, request):
         try:
-            cart = CartModel.objects.get(id=request.data['card'])
+            cart = Card.objects.get(id=request.data['card'])
         except:
-            return ResponseFail(data='Order not found')
+            return ResponseFail(data='Credit Card Not found')
         try:
             order = OrderModel.objects.get(id=request.data['id'])
         except:
