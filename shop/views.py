@@ -270,7 +270,7 @@ class OrderView(APIView):
     )
     def put(self, request):
         try:
-            cart = Card.objects.get(id=request.data['card'])
+            cart = Card.objects.get(id=request.data['credit_card'])
         except:
             return ResponseFail(data='Credit Card Not found')
         try:
