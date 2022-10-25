@@ -271,7 +271,7 @@ class OrderView(APIView):
     def put(self, request):
         try:
             cart = Card.objects.get(id=request.data['credit_card'])
-            return 'hurrey'
+            print(cart, '<---------------------------------')
         except:
             return ResponseFail(data='Credit Card Not found')
         try:
@@ -311,7 +311,7 @@ class OrderView(APIView):
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
-
+        return Response('blabla')
 
 class SearchView(APIView):
     @swagger_auto_schema(
