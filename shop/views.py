@@ -271,7 +271,6 @@ class OrderView(APIView):
     def put(self, request):
         try:
             cart = Card.objects.get(id=request.data['credit_card'])
-            return 'hurrey'
         except:
             return ResponseFail(data='Credit Card Not found')
         try:
@@ -284,33 +283,36 @@ class OrderView(APIView):
             add_key = 1
         except:
             add_key = 0
-        del request.data['id']
-        serializer = OrderCreateSerializer(order, data=request.data)
-        if serializer.is_valid():
-            if add_key == 1:
-                if order.shipping_address is None:
-                    if da.region.delivery_price == 0:
-                        order.price = order.price + settings.DEFAULT_DELIVERY_COST
+        try:
+            del request.data['id']
+            serializer = OrderCreateSerializer(order, data=request.data)
+            if serializer.is_valid():
+                if add_key == 1:
+                    if order.shipping_address is None:
+                        if da.region.delivery_price == 0:
+                            order.price = order.price + settings.DEFAULT_DELIVERY_COST
+                        else:
+                            order.price = order.price + da.region.delivery_price
                     else:
-                        order.price = order.price + da.region.delivery_price
-                else:
-                    old_price = order.shipping_address.region.delivery_price
-                    print(old_price)
-                    if old_price == 0:
-                        order.price = order.price - settings.DEFAULT_DELIVERY_COST
-                        print('1')
-                    else:
-                        order.price = order.price - old_price
-                    if da.region.delivery_price == 0:
-                        order.price = order.price + settings.DEFAULT_DELIVERY_COST
-                    else:
-                        order.price = order.price + da.region.delivery_price
-            order.save()
-            serializer.save()
-            serializer = OrderShowSerializer(order)
-            return ResponseSuccess(data=serializer.data, request=request.method)
-        else:
-            return ResponseFail(data=serializer.errors, request=request.method)
+                        old_price = order.shipping_address.region.delivery_price
+                        print(old_price)
+                        if old_price == 0:
+                            order.price = order.price - settings.DEFAULT_DELIVERY_COST
+                            print('1')
+                        else:
+                            order.price = order.price - old_price
+                        if da.region.delivery_price == 0:
+                            order.price = order.price + settings.DEFAULT_DELIVERY_COST
+                        else:
+                            order.price = order.price + da.region.delivery_price
+                order.save()
+                serializer.save()
+                serializer = OrderShowSerializer(order)
+                return ResponseSuccess(data=serializer.data, request=request.method)
+            else:
+                return ResponseFail(data=serializer.errors, request=request.method)
+        except Exception as e:
+            print(f'\n\n{e}\n\n')
 
 
 class SearchView(APIView):
