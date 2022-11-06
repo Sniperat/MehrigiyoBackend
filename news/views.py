@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import NewsModelSerializer, TagsSerializer, AdvertisingSerializer
-from .models import NewsModel, TagsModel, Advertising
+from .serializers import NewsModelSerializer, TagsSerializer, AdvertisingSerializer, NotificationSerializer
+from .models import NewsModel, TagsModel, Advertising, Notification
 from .filters import NewsFilter
 
 
@@ -99,5 +99,36 @@ class AdvertisingShopView(generics.ListAPIView):
             '200': AdvertisingSerializer()
         },
     )
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+class NotificationView(APIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+    @swagger_auto_schema(
+        operation_id='notification',
+        operation_description="post notifications",
+        request_body=NotificationSerializer(),
+        responses={
+            '200': NotificationSerializer()
+        },)
+
+    def post(self, request, *args, **kwargs):
+        title = request.data.get("title")
+        description = request.data.get("description")
+        image = request.data.get("image")
+        notification_name = request.data.get("notification_name")
+        #sending to firebase
+        
+
+        Notification.objects.create(title=title, description=description, notification_name=notification_name, image=image)
+        print(image)
+        return Response({'message':'success'})
+
+        
+#         manual_parameters=[
+#             openapi.Parameter('limit', openapi.IN_QUERY, description="Number of results to return per page.",
+#                               type=openapi.TYPE_NUMBER)
+#         ],
+#     )

@@ -24,7 +24,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatRoom
-        fields = ['id', 'get_doctor_fullname', 'get_client_fullname', 'created_at']
+        fields = ['id', 'get_doctor_fullname', 'get_client_fullname','token', 'created_at']
 
 
 class RoomsSerializer(serializers.ModelSerializer):
@@ -40,4 +40,4 @@ class RoomsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatRoom
-        fields = ('id', 'client', 'doktor', 'last_message', 'created_at')
+        fields = ('id', 'client', 'doktor', 'last_message','token', 'created_at')

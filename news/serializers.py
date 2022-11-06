@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, Serializer, CharField
-from .models import NewsModel, TagsModel, Advertising
+from .models import NewsModel, TagsModel, Advertising, Notification
 
 
 class AdvertisingSerializer(ModelSerializer):
@@ -38,3 +38,10 @@ class TagsWithNewsSerializer(ModelSerializer):
 
 class InputSerializer(Serializer):
     tag = CharField(max_length=50)
+
+
+class NotificationSerializer(ModelSerializer):
+    
+    class Meta:
+        model = Notification
+        fields = '__all__'
