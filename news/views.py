@@ -6,9 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.responses import ResponseSuccess, ResponseFail
+from config.settings import FIREBASE_REGISTRATION_KEYS
 from .serializers import NewsModelSerializer, TagsSerializer, AdvertisingSerializer, NotificationSerializer
 from .models import NewsModel, TagsModel, Advertising, Notification
 from .filters import NewsFilter
+from .send_notification import sendPush
 
 
 class NewsView(generics.ListAPIView):
@@ -119,12 +121,33 @@ class NotificationView(APIView):
         description = request.data.get("description")
         image = request.data.get("image")
         notification_name = request.data.get("notification_name")
-        #sending to firebase
-        
+        notification = Notification(title=title, description=description, notification_name=notification_name, image=image)
 
-        Notification.objects.create(title=title, description=description, notification_name=notification_name, image=image)
-        print(image)
-        return Response({'message':'success'})
+        #sending to firebase
+        image_path = None
+        if notification.image:
+            image_path = notification.image.path
+        
+        res = sendPush(title=title, description=description, registration_tokens=FIREBASE_REGISTRATION_KEYS, image=image_path)
+        
+        success_count = res.success_count
+        if success_count == 2:
+            return Response({'message':f'success!'})
+            notification.save()
+        elif success_count == 0:
+            return Response({'message':f'failed for both Android and IOS. Exceptions: Android: {res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
+        else:
+            for response in res.responses:
+                if response.exception:
+                    response_index = res.responses.index(response)
+                    if response_index == 0:
+                        error_device = 'Android'
+                    else:
+                        error_device = 'IOS'
+                    
+                    return Response({'message':f'failed for {error_device}. Exception: {response.exception}'})
+                    
+                    
 
         
 #         manual_parameters=[

@@ -45,3 +45,7 @@ class NotificationSerializer(ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+        # extra_kwargs = {
+        #     'title': {'required': True},
+        #     'description': {'required': True},
+        # }
