@@ -116,11 +116,17 @@ class NotificationView(APIView):
 
     def post(self, request, *args, **kwargs):
         title = request.data.get("title")
-        title = request.data.get("title")
-        title = request.data.get("title")
-        title = request.data.get("title")
+        description = request.data.get("description")
+        image = request.data.get("image")
+        notification_name = request.data.get("notification_name")
+        #sending to firebase
+        
 
-        return self.list(request, *args, **kwargs)
+        Notification.objects.create(title=title, description=description, notification_name=notification_name, image=image)
+        print(image)
+        return Response({'message':'success'})
+
+        
 #         manual_parameters=[
 #             openapi.Parameter('limit', openapi.IN_QUERY, description="Number of results to return per page.",
 #                               type=openapi.TYPE_NUMBER)
