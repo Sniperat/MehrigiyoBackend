@@ -64,6 +64,7 @@ class ChatView(APIView):
 
             serializer = ChatSerializer(room)
             return ResponseSuccess(data=serializer.data, request=request.method)
+        return ResponseFail(data="Tere is no key, no admin!")
 
 
 class MyChatsView(APIView):
