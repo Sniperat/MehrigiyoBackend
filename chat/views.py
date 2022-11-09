@@ -49,7 +49,11 @@ class ChatView(APIView):
             serializer = ChatSerializer(room)
             return ResponseSuccess(data=serializer.data, request=request.method)
         if key:
-            doctor = Doctor.objects.get(id=key)
+            try:
+                doctor = Doctor.objects.get(id=key)
+            except:
+                return ResponseFail(data='Doctor not Found')
+            
             user = UserModel.objects.get(specialist_doctor=doctor, is_staff=True)
 
             try:
