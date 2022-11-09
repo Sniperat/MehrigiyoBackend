@@ -12,7 +12,7 @@ result_str = ''.join(random.choice(letters) for i in range(20))
 class Message(models.Model):
     owner = models.ForeignKey(UserModel, on_delete=models.RESTRICT)
     text = models.CharField(max_length=255, null=True, blank=True)
-    image = models.ImageField(upload_to=f'message/images/{today.year}-{today.month}-{today.month}/',
+    image = models.TextField(max_length=255,
                               null=True, blank=True)
     file = models.FileField(upload_to=f'message/files/{today.year}-{today.month}-{today.month}/',
                             null=True, blank=True)
