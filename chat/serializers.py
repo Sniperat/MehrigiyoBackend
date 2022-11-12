@@ -1,8 +1,25 @@
 from rest_framework import serializers
-from .models import ChatRoom, Message
+from .models import ChatRoom, Message, FileMessage
 from account.models import UserModel
 
+
+class ChatSerializer(serializers.ModelSerializer):
+    # messages = MessageSerializer(many=True)
+
+    class Meta:
+        model = ChatRoom
+        fields = ['id', 'get_doctor_fullname', 'get_client_fullname','token', 'created_at']
+
+
+class FileMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FileMessage
+        fields = '__all__'
+
+
 class MessageSerializer(serializers.ModelSerializer):
+    file_message = FileMessageSerializer()
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -19,13 +36,6 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ChatSerializer(serializers.ModelSerializer):
-    # messages = MessageSerializer(many=True)
-
-    class Meta:
-        model = ChatRoom
-        fields = ['id', 'get_doctor_fullname', 'get_client_fullname','token', 'created_at']
-
 
 class RoomsSerializer(serializers.ModelSerializer):
     last_message = MessageSerializer()
@@ -41,3 +51,4 @@ class RoomsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatRoom
         fields = ('id', 'client', 'doktor', 'last_message','token', 'created_at')
+

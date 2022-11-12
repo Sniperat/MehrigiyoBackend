@@ -1,19 +1,23 @@
 from channels.db import database_sync_to_async
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from .serializers import MessageSerializer
-from .models import ChatRoom, Message
+from .models import ChatRoom, Message, FileMessage
 from asgiref.sync import async_to_sync
 import json
 
 
 def getMessage(chat_id, user, msg):
+    f =FileMessage.objects.get(id=msg['file_message'])
+    del msg['file_message']
     message = Message(**msg)
     message.owner = user
+    message.file_message = f
     message.save()
     room = ChatRoom.objects.get(id=chat_id)
     room.messages.add(message)
     room.save()
     serializer = MessageSerializer(message)
+
 
     return serializer.data
 

@@ -11,8 +11,8 @@ from rest_framework import generics
 
 from account.models import UserModel, OfferModel
 from account.serializers import OfferSerializer
-from .models import ChatRoom, Message
-from .serializers import ChatSerializer, RoomsSerializer, MessageSerializer
+from .models import ChatRoom, Message, FileMessage
+from .serializers import ChatSerializer, RoomsSerializer, MessageSerializer, FileMessageSerializer
 from specialist.models import Doctor, AdviceTime
 from rest_framework.views import APIView
 from config.responses import ResponseFail, ResponseSuccess
@@ -41,9 +41,12 @@ class ChatView(APIView):
             except:
                 room = None
             if room is None:
+                from uuid import uuid4
+                rand_token = uuid4()
                 room = ChatRoom()
                 room.client = request.user
                 room.admin = user
+                room.token = rand_token
                 room.save()
 
             serializer = ChatSerializer(room)
@@ -71,6 +74,49 @@ class ChatView(APIView):
         return ResponseFail(data="Tere is no key, no admin!")
 
 
+class FileMessageView(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        operation_id='file_mess',
+        operation_description="File Message",
+        responses={
+            '200': FileMessageSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="File ID",
+                              type=openapi.TYPE_NUMBER),
+        ],
+    )
+    def get(self, request):
+        key = request.GET.get('pk', False)
+        if key:
+            file = FileMessage.objects.get(id=key)
+            serializer = FileMessageSerializer(file)
+            return ResponseSuccess(serializer.data)
+        return ResponseFail(data="File not found")
+    
+    @swagger_auto_schema(
+        operation_id='file_mess_create',
+        operation_description="File Message Create",
+        request_body=FileMessageSerializer,
+        responses={
+            '200': FileMessageSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="File ID",
+                              type=openapi.TYPE_NUMBER),
+        ],
+    )
+    def post(self, request):
+        serializer = FileMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return ResponseSuccess(data=serializer.data)
+        else:
+            return ResponseFail(data=serializer.errors)
+
+
 class MyChatsView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -86,9 +132,14 @@ class MyChatsView(APIView):
 
         rooms = ChatRoom.objects.filter(client=request.user)
         ad = AdviceTime.objects.filter(client=request.user, start_time__gte=datetime.datetime.now()).first()
+        print(ad)
         serializer = RoomsSerializer(rooms, many=True)
-        serializer.data['start_chat'] = ad.start_time
-        return ResponseSuccess(data=serializer.data, request=request.method)
+        if ad is None:
+            return ResponseSuccess(data=serializer.data, request=request.method)
+        else:
+            serializer.data['start_chat'] = ad.start_time
+            return ResponseSuccess(data=serializer.data, request=request.method)
+
 
 
 class MessageView(generics.ListAPIView):

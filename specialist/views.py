@@ -170,25 +170,30 @@ class AdviceView(APIView):
             '200': AdviceSerializer()
         },
         manual_parameters=[
-            openapi.Parameter('date', openapi.IN_QUERY, description="%d/%m/%y %H:%M:%S", type=openapi.TYPE_STRING),
+            openapi.Parameter('day', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
+            openapi.Parameter('month', openapi.IN_QUERY,  type=openapi.TYPE_INTEGER),
+            openapi.Parameter('year', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
+
             openapi.Parameter('my', openapi.IN_QUERY, description="all clients time", type=openapi.TYPE_BOOLEAN)
         ]
     )
     def get(self, request, pk):
-        date_own = request.GET.get('date', False)
+        day = request.GET.get('day', False)
+        month = request.GET.get('month', False)
+        year = request.GET.get('year', False)
         my = request.GET.get('my', False)
-
-        date_obj = datetime.datetime.strptime(date_own, '%d/%m/%y %H:%M:%S')
 
         if my:
             advice = AdviceTime.objects.filter(doctor_id=pk,
                                                client=request.user,
-                                               start_time__day=date_obj.day,
-                                               start_time__month=date_obj.month)
+                                               start_time__day=day,
+                                               start_time__month=month,
+                                               start_time__year=year)
         else:
             advice = AdviceTime.objects.filter(doctor_id=pk,
-                                               start_time__day=date_obj.day,
-                                               start_time__month=date_obj.month)
+                                               start_time__day=day,
+                                               start_time__month=month,
+                                               start_time__year=year)
 
         ser = AdviceSerializer(advice, many=True)
         return ResponseSuccess(data=ser.data)
