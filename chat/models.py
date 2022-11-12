@@ -17,6 +17,7 @@ class Message(models.Model):
 
 class FileMessage(models.Model):
     image = models.ImageField(upload_to=f'message/images/{today.year}-{today.month}-{today.month}/',
+
                               null=True, blank=True)
     file = models.FileField(upload_to=f'message/files/{today.year}-{today.month}-{today.month}/',
                             null=True, blank=True)
