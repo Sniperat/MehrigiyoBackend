@@ -14,7 +14,7 @@ import datetime
 import pytz
 
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer, AdvertisingSerializer, AdviceSerializer
+from .serializers import TypeDoctorSerializer, DoctorSerializer, RateSerializer, AdvertisingSerializer, AdviceSerializer, AdvicecDocSerializer
 from .models import Doctor, TypeDoctor, AdviceTime, Advertising
 from .filters import DoctorFilter
 
@@ -198,6 +198,22 @@ class AdviceView(APIView):
         ser = AdviceSerializer(advice, many=True)
         return ResponseSuccess(data=ser.data)
 
+
+    @swagger_auto_schema(
+        operation_id='post_advice_times',
+        operation_description="post_advice_times",
+        request_body=AdvicecDocSerializer(),
+        responses={
+            '200': AdviceSerializer()
+        },
+        # manual_parameters=[
+        #     openapi.Parameter('day', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
+        #     openapi.Parameter('month', openapi.IN_QUERY,  type=openapi.TYPE_INTEGER),
+        #     openapi.Parameter('year', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
+
+        #     openapi.Parameter('my', openapi.IN_QUERY, description="all clients time", type=openapi.TYPE_BOOLEAN)
+        # ]
+    )
     def post(self, request, pk):
         date_time_start = request.data['start_time']
         date_time_end = request.data['end_time']
