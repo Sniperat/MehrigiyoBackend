@@ -85,5 +85,7 @@ class RateSerializer(serializers.ModelSerializer):
         return instance
 
 
-
+class AdvicecDocSerializer(serializers.Serializer):
+    start_time = serializers.DateTimeField()
+    end_time = serializers.DateTimeField()
 
