@@ -7,8 +7,11 @@ import json
 
 
 def getMessage(chat_id, user, msg):
-    f =FileMessage.objects.get(id=msg['file_message'])
-    del msg['file_message']
+    try:
+        f =FileMessage.objects.get(id=msg['file_message'])
+        del msg['file_message']
+    except:
+        f = None
     message = Message(**msg)
     message.owner = user
     message.file_message = f
