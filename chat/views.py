@@ -137,7 +137,7 @@ class MyChatsView(APIView):
         if ad is None:
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
-            serializer.data['start_chat'] = ad.start_time
+            # serializer.data['start_chat'] = ad.start_time
             return ResponseSuccess(data=serializer.data, request=request.method)
 
 
