@@ -57,7 +57,7 @@ class RoomsSerializer(serializers.ModelSerializer):
 
     def get_doctor(self, obj):
         imma = obj.doktor.specialist_doctor.image.url
-        if imma != None:
+        if imma != '':
             return {
                 "doctor_account_id": obj.doktor.id,
                 "specialist_account_id": obj.doktor.specialist_doctor.id,
