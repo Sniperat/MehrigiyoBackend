@@ -182,18 +182,24 @@ class AdviceView(APIView):
         month = request.GET.get('month', False)
         year = request.GET.get('year', False)
         my = request.GET.get('my', False)
-
-        if my:
-            advice = AdviceTime.objects.filter(doctor_id=pk,
-                                               client=request.user,
-                                               start_time__day=day,
-                                               start_time__month=month,
-                                               start_time__year=year)
+        if day:
+            if my:
+                advice = AdviceTime.objects.filter(doctor_id=pk,
+                                                client=request.user,
+                                                start_time__day=day,
+                                                start_time__month=month,
+                                                start_time__year=year)
+            else:
+                advice = AdviceTime.objects.filter(doctor_id=pk,
+                                                start_time__day=day,
+                                                start_time__month=month,
+                                                start_time__year=year)
         else:
-            advice = AdviceTime.objects.filter(doctor_id=pk,
-                                               start_time__day=day,
-                                               start_time__month=month,
-                                               start_time__year=year)
+            if my:
+                advice = AdviceTime.objects.filter(doctor_id=pk,
+                                                client=request.user)
+            else:
+                advice = AdviceTime.objects.filter(doctor_id=pk)
 
         ser = AdviceSerializer(advice, many=True)
         return ResponseSuccess(data=ser.data)
