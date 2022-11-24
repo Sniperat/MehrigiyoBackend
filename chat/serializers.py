@@ -56,13 +56,22 @@ class RoomsSerializer(serializers.ModelSerializer):
             return ''
 
     def get_doctor(self, obj):
-        return {
-            "doctor_account_id": obj.doktor.id,
-            "specialist_account_id": obj.doktor.specialist_doctor.id,
-            "name": obj.doktor.get_full_name(),
-            "image": obj.doktor.specialist_doctor.image.url,
-            "type": obj.doktor.specialist_doctor.type_doctor.name
-        }
+        imma = obj.doktor.specialist_doctor.image.url
+        if imma != None:
+            return {
+                "doctor_account_id": obj.doktor.id,
+                "specialist_account_id": obj.doktor.specialist_doctor.id,
+                "name": obj.doktor.get_full_name(),
+                "image": imma,
+                "type": obj.doktor.specialist_doctor.type_doctor.name
+            }
+        else:
+             return {
+                "doctor_account_id": obj.doktor.id,
+                "specialist_account_id": obj.doktor.specialist_doctor.id,
+                "name": obj.doktor.get_full_name(),
+                "type": obj.doktor.specialist_doctor.type_doctor.name
+            }
    
     def get_cname(self, obj):
         return obj.client.get_full_name()

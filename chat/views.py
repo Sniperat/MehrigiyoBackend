@@ -117,8 +117,10 @@ class FileMessageView(APIView):
             return ResponseFail(data=serializer.errors)
 
 
-class MyChatsView(APIView):
+class MyChatsView(generics.ListAPIView):
+    queryset = ChatRoom.objects.all()
     permission_classes = (IsAuthenticated,)
+    serializer_class = RoomsSerializer
 
     @swagger_auto_schema(
         operation_id='chat_view',
@@ -128,17 +130,14 @@ class MyChatsView(APIView):
             '200': RoomsSerializer()
         },
     )
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
 
         rooms = ChatRoom.objects.filter(client=request.user)
-        ad = AdviceTime.objects.filter(client=request.user, start_time__gte=datetime.datetime.now()).first()
-        print(ad)
-        serializer = RoomsSerializer(rooms, many=True)
-        if ad is None:
-            return ResponseSuccess(data=serializer.data, request=request.method)
-        else:
-            # serializer.data['start_chat'] = ad.start_time
-            return ResponseSuccess(data=serializer.data, request=request.method)
+        # ad = AdviceTime.objects.filter(client=request.user, start_time__gte=datetime.datetime.now()).first()
+        # print(ad)
+        self.queryset = rooms
+        # serializer = RoomsSerializer(rooms, many=True)
+        return self.list(request, *args, **kwargs)
 
 
 

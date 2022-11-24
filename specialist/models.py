@@ -1,4 +1,5 @@
 from django.db import models
+from config.settings import BASE_DIR
 
 
 class TypeDoctor(models.Model):
@@ -14,7 +15,8 @@ class TypeDoctor(models.Model):
 
 
 class Doctor(models.Model):
-    image = models.ImageField(upload_to=f'doctor/', null=True, blank=True)
+    image = models.ImageField(upload_to=f'doctor/', blank=True, default='defaults/60111.jpg')
+    #  default=BASE_DIR /'60111.jpg')
     full_name = models.CharField(max_length=255, null=True)
     review = models.IntegerField(default=0)
     experience = models.CharField(max_length=50, null=True)
