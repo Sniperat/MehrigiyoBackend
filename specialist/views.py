@@ -174,14 +174,16 @@ class AdviceView(APIView):
             openapi.Parameter('month', openapi.IN_QUERY,  type=openapi.TYPE_INTEGER),
             openapi.Parameter('year', openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
 
-            openapi.Parameter('my', openapi.IN_QUERY, description="all clients time", type=openapi.TYPE_BOOLEAN)
+            openapi.Parameter('my', openapi.IN_QUERY, description="all clients time", type=openapi.TYPE_BOOLEAN),
+            openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER)
         ]
     )
-    def get(self, request, pk):
+    def get(self, request):
         day = request.GET.get('day', False)
         month = request.GET.get('month', False)
         year = request.GET.get('year', False)
         my = request.GET.get('my', False)
+        pk = request.GET.get('id', False)
         if day:
             if my:
                 advice = AdviceTime.objects.filter(doctor_id=pk,
@@ -196,8 +198,11 @@ class AdviceView(APIView):
                                                 start_time__year=year)
         else:
             if my:
-                advice = AdviceTime.objects.filter(doctor_id=pk,
+                if pk:
+                    advice = AdviceTime.objects.filter(doctor_id=pk,
                                                 client=request.user)
+                else:
+                    advice = AdviceTime.objects.filter(client=request.user)
             else:
                 advice = AdviceTime.objects.filter(doctor_id=pk)
 
@@ -220,9 +225,10 @@ class AdviceView(APIView):
         #     openapi.Parameter('my', openapi.IN_QUERY, description="all clients time", type=openapi.TYPE_BOOLEAN)
         # ]
     )
-    def post(self, request, pk):
+    def post(self, request):
         date_time_start = request.data['start_time']
         date_time_end = request.data['end_time']
+        pk = request.data['id']
 
         date_time_start_obj = date_time_start
         #  datetime.datetime.strptime(date_time_start, '%d/%m/%y %H:%M:%S')

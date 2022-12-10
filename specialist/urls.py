@@ -13,5 +13,5 @@ urlpatterns = [
     path('doctors/', DoctorsView.as_view()),
     path('advertising/', AdvertisingView.as_view()),
     path('doctors/one/', GetSingleDoctor.as_view({'list': 'get'})),
-    path('advice/<int:pk>/', AdviceView.as_view()),
+    path('advice/', AdviceView.as_view()),
 ]
