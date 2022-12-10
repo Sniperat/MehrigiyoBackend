@@ -88,4 +88,5 @@ class RateSerializer(serializers.ModelSerializer):
 class AdvicecDocSerializer(serializers.Serializer):
     start_time = serializers.DateTimeField()
     end_time = serializers.DateTimeField()
+    id = serializers.IntegerField()
 
