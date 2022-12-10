@@ -224,8 +224,10 @@ class AdviceView(APIView):
         date_time_start = request.data['start_time']
         date_time_end = request.data['end_time']
 
-        date_time_start_obj = datetime.datetime.strptime(date_time_start, '%d/%m/%y %H:%M:%S')
-        date_time_end_obj = datetime.datetime.strptime(date_time_end, '%d/%m/%y %H:%M:%S')
+        date_time_start_obj = date_time_start
+        #  datetime.datetime.strptime(date_time_start, '%d/%m/%y %H:%M:%S')
+        date_time_end_obj = date_time_end
+        # datetime.datetime.strptime(date_time_end, '%d/%m/%y %H:%M:%S')
 
         advice = None
         try:
