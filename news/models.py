@@ -42,11 +42,12 @@ class Advertising(models.Model):
         (2, 'doctors')
     ), default=1, db_index=True)
 
+
 class Notification(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to=f'notification/', null=True, blank=True)
     notification_name = models.CharField(max_length=255, blank=True, null=True)
-    created_time  = models.DateTimeField(auto_now_add=True)
+    created_time = models.DateTimeField(auto_now_add=True)
 
 

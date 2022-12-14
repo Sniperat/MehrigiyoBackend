@@ -302,6 +302,7 @@ class MedicineView(generics.ListAPIView, APIView):
 class DoctorView(generics.ListAPIView, APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DoctorSerializer
+
     @swagger_auto_schema(
         operation_id='get_favorite_doctors',
         operation_description="get_favorite_doctors",
@@ -422,7 +423,6 @@ class DeliverAddressView(generics.ListAPIView, APIView):
         else:
             return ResponseFail(data=serializers.errors)
 
-
     @swagger_auto_schema(
         operation_id='delete_delivery_address',
         operation_description="delete_delivery_address",
@@ -434,8 +434,6 @@ class DeliverAddressView(generics.ListAPIView, APIView):
             return ResponseSuccess(data='delete!')
         except:
             return ResponseFail(data='delivery address not found')
-
-
 
 
 class OfferView(APIView):
@@ -454,3 +452,27 @@ class OfferView(APIView):
             return ResponseSuccess(data=serializer.data)
         else:
             return ResponseFail(data=serializer.errors)
+
+
+class SetRegistrationKeyView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        operation_id='registration_key',
+        operation_description="Set Registration key",
+        # request_body=OfferSerializer(),
+        # responses={
+        #     '200': OfferSerializer()
+        # },
+        manual_parameters=[
+            openapi.Parameter('regId', openapi.IN_QUERY, type=openapi.TYPE_STRING)
+        ]
+    )
+    def get(self, request):
+        key = request.GET.get('regId', False)
+        if key:
+            user = request.user
+            user.notificationKey = key
+            user.save()
+            return ResponseSuccess()
+        return ResponseFail()
