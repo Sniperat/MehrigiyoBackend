@@ -66,6 +66,7 @@ class UserModel(AbstractUser):
 
     specialist_doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT,
                                           null=True, blank=True, related_name='worker')
+    notificationKey = models.CharField(max_length=255, null=True, blank=True)
     username_validator = PhoneValidator()
 
     class Meta:

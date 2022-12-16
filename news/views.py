@@ -2,6 +2,7 @@ from django.shortcuts import render
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,6 +12,7 @@ from .serializers import NewsModelSerializer, TagsSerializer, AdvertisingSeriali
 from .models import NewsModel, TagsModel, Advertising, Notification
 from .filters import NewsFilter
 from .send_notification import sendPush
+from account.models import UserModel
 
 
 class NewsView(generics.ListAPIView):
@@ -104,9 +106,12 @@ class AdvertisingShopView(generics.ListAPIView):
     def post(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+
 class NotificationView(APIView):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
+    permission_classes = (IsAuthenticated,)
+
 
     @swagger_auto_schema(
         operation_id='notification',
@@ -115,27 +120,29 @@ class NotificationView(APIView):
         responses={
             '200': NotificationSerializer()
         },)
-
     def post(self, request, *args, **kwargs):
         title = request.data.get("title")
         description = request.data.get("description")
         image = request.data.get("image")
         notification_name = request.data.get("notification_name")
-        notification = Notification(title=title, description=description, notification_name=notification_name, image=image)
+        notification = Notification(title=title, description=description, notification_name=notification_name,
+                                    image=image)
 
-        #sending to firebase
+        # sending to firebase
         image_path = None
         if notification.image:
             image_path = notification.image.path
-        
-        res = sendPush(title=title, description=description, registration_tokens=FIREBASE_REGISTRATION_KEYS, image=image_path)
+        keys = list(UserModel.objects.filter().values_list('notificationKey', flat=True))
+        res = sendPush(title=title, description=description, registration_tokens=keys,
+                       image=image_path)
         
         success_count = res.success_count
         if success_count == 2:
-            return Response({'message':f'success!'})
+            return Response({'message': f'success!'})
             notification.save()
         elif success_count == 0:
-            return Response({'message':f'failed for both Android and IOS. Exceptions: Android: {res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
+            return Response({'message': f'failed for both Android and IOS. Exceptions: Android: '
+                                        f'{res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
         else:
             for response in res.responses:
                 if response.exception:
@@ -145,13 +152,53 @@ class NotificationView(APIView):
                     else:
                         error_device = 'IOS'
                     
-                    return Response({'message':f'failed for {error_device}. Exception: {response.exception}'})
-                    
+                    return Response({'message': f'failed for {error_device}. Exception: {response.exception}'})
                     
 
-        
-#         manual_parameters=[
-#             openapi.Parameter('limit', openapi.IN_QUERY, description="Number of results to return per page.",
-#                               type=openapi.TYPE_NUMBER)
-#         ],
-#     )
+class NotificationCallView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        operation_id='call_notification',
+        operation_description="post Call notifications",
+        # request_body=NotificationSerializer(),
+        responses={
+            '200': NotificationSerializer()
+        },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_QUERY, description="Send USer Id",
+                              type=openapi.TYPE_NUMBER)
+        ],
+    )
+    def post(self, request):
+        pk = request.GET.get('pk', False)
+        user = UserModel.objects.get(id=pk)
+        current_user = request.user
+
+        # sending to firebase
+        image_path = None
+        try:
+            current_user.avatar.path
+        except:
+            pass
+
+        res = sendPush(title='CALL', description=current_user.get_full_name(),
+                       registration_tokens=[user.notificationKey],
+                       image=image_path)
+        success_count = res.success_count
+
+        if success_count == 2:
+            return Response({'message': f'success!'})
+        elif success_count == 0:
+            return Response({'message': f'failed for both Android and IOS. Exceptions: Android: '
+                                        f'{res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
+        else:
+            for response in res.responses:
+                if response.exception:
+                    response_index = res.responses.index(response)
+                    if response_index == 0:
+                        error_device = 'Android'
+                    else:
+                        error_device = 'IOS'
+
+                    return Response({'message': f'failed for {error_device}. Exception: {response.exception}'})
