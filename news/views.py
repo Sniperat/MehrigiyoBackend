@@ -133,7 +133,13 @@ class NotificationView(APIView):
         if notification.image:
             image_path = notification.image.path
         keys = list(UserModel.objects.filter().values_list('notificationKey', flat=True))
-        res = sendPush(title=title, description=description, registration_tokens=keys,
+        res = []
+        for val in keys:
+            if val != None :
+                res.append(val)
+ 
+        print(res)
+        res = sendPush(title=title, description=description, registration_tokens=res,
                        image=image_path)
         
         success_count = res.success_count
