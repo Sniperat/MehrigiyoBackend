@@ -21,4 +21,3 @@ def sendPush(title, description, registration_tokens, image=None, notification_n
     response = messaging.send_multicast(message)
     # Response is a message ID string.
     return response
-    print('Successfully sent message:', response)

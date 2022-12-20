@@ -2,6 +2,7 @@ from django.db import models
 import datetime
 from specialist.models import Doctor
 from shop.models import Medicine
+from .tasks import send_notification_func
 # from django.utils.translation import gettext as _
 
 today = datetime.date.today()
@@ -47,7 +48,19 @@ class Notification(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to=f'notification/', null=True, blank=True)
-    notification_name = models.CharField(max_length=255, blank=True, null=True)
-    created_time = models.DateTimeField(auto_now_add=True)
+    foreign_id = models.CharField(max_length=255, blank=True, null=True)
+    push_time = models.DateTimeField(default=datetime.datetime.now())
+    type = models.SmallIntegerField(choices=(
+        (1, 'medicines'),
+        (2, 'doctors')
+    ), default=1, db_index=True)
+
+    def save(self, *args, **kwargs):
+        image_path = None
+        if self.image:
+            image_path = self.image.path
+        send_notification_func.s(self.title, self.description, image_path, self.type, self.foreign_id).apply_async(eta=self.push_time + datetime.timedelta(seconds=30))
+        print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLAAAAAAAAA")
+        super(Notification, self).save(*args, **kwargs)
 
 

@@ -76,7 +76,7 @@ def send_sms(phone, text):
             'messages': [
                 {
                     'recipient': phone,
-                    'message-id': 'BrainsBerry' + str(round(time.time() * 1000)),
+                    'message-id': 'Mehrigiyo' + str(round(time.time() * 1000)),
                     'sms': {
                         'originator': '3700',
                         'content': {
