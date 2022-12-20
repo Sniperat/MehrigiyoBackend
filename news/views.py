@@ -13,6 +13,7 @@ from .models import NewsModel, TagsModel, Advertising, Notification
 from .filters import NewsFilter
 from .send_notification import sendPush
 from account.models import UserModel
+from .tasks import send_notification_func
 
 
 class NewsView(generics.ListAPIView):
@@ -141,24 +142,28 @@ class NotificationView(APIView):
         print(res)
         res = sendPush(title=title, description=description, registration_tokens=res,
                        image=image_path)
-        
+        print('1 ',res)
+        send_notification_func.apply_async(countdown=10)
+        notification.save()
+
+        print(res.success_count)
         success_count = res.success_count
-        if success_count == 2:
-            return Response({'message': f'success!'})
-            notification.save()
-        elif success_count == 0:
-            return Response({'message': f'failed for both Android and IOS. Exceptions: Android: '
-                                        f'{res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
-        else:
-            for response in res.responses:
-                if response.exception:
-                    response_index = res.responses.index(response)
-                    if response_index == 0:
-                        error_device = 'Android'
-                    else:
-                        error_device = 'IOS'
+        if success_count == 0:
+            return Response(data={'message': f'failed. Exceptions:'
+                                        f'{res.responses[0].exception}'})
+        return Response(data={'message': f'success!'})
+
+            
+        # else:
+        #     for response in res.responses:
+        #         if response.exception:
+        #             response_index = res.responses.index(response)
+        #             if response_index == 0:
+        #                 error_device = 'Android'
+        #             else:
+        #                 error_device = 'IOS'
                     
-                    return Response({'message': f'failed for {error_device}. Exception: {response.exception}'})
+        #             return Response(data={'message': f'failed for {error_device}. Exception: {response.exception}'})
                     
 
 class NotificationCallView(APIView):
@@ -193,18 +198,24 @@ class NotificationCallView(APIView):
                        image=image_path)
         success_count = res.success_count
 
-        if success_count == 2:
-            return Response({'message': f'success!'})
-        elif success_count == 0:
-            return Response({'message': f'failed for both Android and IOS. Exceptions: Android: '
-                                        f'{res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
-        else:
-            for response in res.responses:
-                if response.exception:
-                    response_index = res.responses.index(response)
-                    if response_index == 0:
-                        error_device = 'Android'
-                    else:
-                        error_device = 'IOS'
+        if success_count == 0:
+            return Response(data={'message': f'failed. Exceptions:'
+                                        f'{res.responses[0].exception}'})
+            # notification.save()
+        return Response(data={'message': f'success!'})
 
-                    return Response({'message': f'failed for {error_device}. Exception: {response.exception}'})
+        # if success_count == 2:
+        #     return Response({'message': f'success!'})
+        # elif success_count == 0:
+        #     return Response({'message': f'failed for both Android and IOS. Exceptions: Android: '
+        #                                 f'{res.responses[0].exception}, IOS: {res.responses[1].exception}]'})
+        # else:
+        #     for response in res.responses:
+        #         if response.exception:
+        #             response_index = res.responses.index(response)
+        #             if response_index == 0:
+        #                 error_device = 'Android'
+        #             else:
+        #                 error_device = 'IOS'
+
+        #             return Response({'message': f'failed for {error_device}. Exception: {response.exception}'})
