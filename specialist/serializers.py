@@ -6,13 +6,6 @@ from .models import Doctor, TypeDoctor, RateDoctor, Advertising, AdviceTime
 from comment.models import CommentDoctor
 
 
-class AdviceSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = AdviceTime
-        fields = '__all__'
-
-
 class AdvertisingSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -90,3 +83,10 @@ class AdvicecDocSerializer(serializers.Serializer):
     end_time = serializers.DateTimeField()
     id = serializers.IntegerField()
 
+
+class AdviceSerializer(serializers.ModelSerializer):
+    doctor = DoctorSerializer()
+
+    class Meta:
+        model = AdviceTime
+        fields = '__all__'
