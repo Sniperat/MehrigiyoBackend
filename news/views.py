@@ -108,7 +108,7 @@ class AdvertisingShopView(generics.ListAPIView):
         return self.list(request, *args, **kwargs)
 
 
-class NotificationView(APIView):
+class NotificationView(generics.ListAPIView):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = (IsAuthenticated,)
@@ -116,42 +116,13 @@ class NotificationView(APIView):
 
     @swagger_auto_schema(
         operation_id='notification',
-        operation_description="post notifications",
-        request_body=NotificationSerializer(),
+        operation_description="get notifications",
+        # request_body=NotificationSerializer(),
         responses={
             '200': NotificationSerializer()
         },)
-    def post(self, request, *args, **kwargs):
-        title = request.data.get("title")
-        description = request.data.get("description")
-        image = request.data.get("image")
-        notification_name = request.data.get("notification_name")
-        notification = Notification(title=title, description=description, notification_name=notification_name,
-                                    image=image)
-
-        # sending to firebase
-        image_path = None
-        if notification.image:
-            image_path = notification.image.path
-        keys = list(UserModel.objects.filter().values_list('notificationKey', flat=True))
-        res = []
-        for val in keys:
-            if val != None :
-                res.append(val)
- 
-        print(res)
-        res = sendPush(title=title, description=description, registration_tokens=res,
-                       image=image_path)
-        print('1 ',res)
-        send_notification_func.apply_async(countdown=10)
-        notification.save()
-
-        print(res.success_count)
-        success_count = res.success_count
-        if success_count == 0:
-            return Response(data={'message': f'failed. Exceptions:'
-                                        f'{res.responses[0].exception}'})
-        return Response(data={'message': f'success!'})
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
             
         # else:
