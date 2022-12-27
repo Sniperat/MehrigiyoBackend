@@ -160,6 +160,7 @@ class PayTransactionView(APIView):
 
         data = create_transaction(order.id, order.price)
         if 'error' in data:
+            print('HAVE A ERROR TO CREATE TRANSACTION')
             order.payment_status = 2
             order.save()
             return ResponseFail(data=data)
@@ -176,6 +177,7 @@ class PayTransactionView(APIView):
         model.save()
         data = pay_transaction(model._id, order.credit_card.token)
         if 'error' in data:
+            print('HAVE A ERROR TO PAY')
             order.payment_status = 2
             order.save()
             return ResponseFail(data=data)
@@ -189,7 +191,8 @@ class PayTransactionView(APIView):
         model.save()
         order.payment_status = 3
         order.save()
-        data = send_transaction(model._id, request.user.username)
-        if 'error' in data:
-            return ResponseFail(data=data)
+        # data = send_transaction(model._id, request.user.username)
+        # if 'error' in data:
+        #     print('HAVE A ERROR TO SEND TRANSACTION')
+        #     return ResponseFail(data=data)
         return ResponseSuccess(data=data)
