@@ -73,15 +73,18 @@ class RegistrationView(APIView):
         },
     )
     def post(self, request):
+        number = request.data['username']
+        print(number)
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             numbers = SmsCode.objects.filter(confirmed=True)
             access = False
             for i in numbers:
-                if serializer.data['username'] == i.phone:
+                if number == i.phone:
                     access = True
                     i.confirmed = False
                     i.save()
+            print(access, 'aaaaaaaaaaaaaaa')
             if access:
                 user = serializer.save()
                 access_token = AccessToken().for_user(user)
