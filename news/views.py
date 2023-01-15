@@ -38,7 +38,7 @@ class NewsView(generics.ListAPIView):
         key = request.GET.get('tag_id', False)
         if key:
             keys = key.split(',')
-            self.queryset = NewsModel.objects.filter(hashtag_id__id=keys)
+            self.queryset = NewsModel.objects.filter(hashtag_id__id__in=keys)
         return self.list(request, *args, **kwargs)
     # def get(self, request):
     #     filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
