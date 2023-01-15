@@ -53,7 +53,7 @@ class RoomsSerializer(serializers.ModelSerializer):
             ser = AdviceSerializer(ad)
             return ser.data
         else:
-            return ''
+            return None
 
     def get_doctor(self, obj):
         try:

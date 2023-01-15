@@ -200,11 +200,11 @@ class AdviceView(APIView):
             if my:
                 if pk:
                     advice = AdviceTime.objects.filter(doctor_id=pk,
-                                                client=request.user)
+                                                client=request.user, start_time__gte=datetime.datetime.now())
                 else:
-                    advice = AdviceTime.objects.filter(client=request.user)
+                    advice = AdviceTime.objects.filter(client=request.user, start_time__gte=datetime.datetime.now())
             else:
-                advice = AdviceTime.objects.filter(doctor_id=pk)
+                advice = AdviceTime.objects.filter(doctor_id=pk, start_time__gte=datetime.datetime.now())
 
         ser = AdviceSerializer(advice, many=True)
         return ResponseSuccess(data=ser.data)
