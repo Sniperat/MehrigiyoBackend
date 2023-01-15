@@ -30,7 +30,7 @@ class NewsView(generics.ListAPIView):
             '200': NewsModelSerializer()
         },
         manual_parameters=[
-            openapi.Parameter('tag_id', openapi.IN_QUERY, description="test manual param",
+            openapi.Parameter('tag_id', openapi.IN_QUERY, description="test manual params",
                               type=openapi.TYPE_STRING)
         ],
     )
