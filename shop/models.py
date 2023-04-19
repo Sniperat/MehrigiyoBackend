@@ -11,6 +11,9 @@ class PicturesMedicine(models.Model):
     image = models.ImageField(upload_to=f'medicine_pictures/{today.year}-{today.month}-{today.month}/',
                               null=True, blank=True)
 
+    def __str__(self):
+        return f"ID{self.id}: {self.image}"
+
 
 class TypeMedicine(models.Model):
     name = models.CharField(max_length=100)
@@ -54,6 +57,9 @@ class CartModel(models.Model):
     def get_total_price(self):
         return self.product.cost * self.amount - (self.product.discount * self.amount)
 
+    def __str__(self):
+        return f"{self.user}'s cart for product {self.product} {self.amount} pcs. ({self.status})"
+
 
 PAYMENT_TYPES = (
     (1, 'Оплата при доставке'),
@@ -81,6 +87,9 @@ DELIVERY_STATUS = (
 class DeliveryMan(models.Model):
     full_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"{self.full_name} ({self.phone})"
 
 
 class OrderModel(models.Model):

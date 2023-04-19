@@ -43,8 +43,8 @@ class UserManager(BaseUserManager):
 
 class UserModel(AbstractUser):
     objects = UserManager()
-    username = models.CharField(max_length=15, unique=True,
-                                validators=[PhoneValidator()], help_text="Пожалуйста, укажите свой пароль")
+#    username = models.CharField(max_length=15, unique=True, help_text="Пожалуйста, укажите свой пароль")
+    username = models.CharField(max_length=15, unique=True, validators=[PhoneValidator()], help_text="Пожалуйста, укажите свой пароль")
     password = models.CharField(max_length=256, null=True, blank=True)
     email = models.EmailField(validators=[EmailValidator()], null=True, blank=True)
     avatar = models.ImageField(upload_to=f'avatars/{today.year}-{today.month}-{today.month}/', null=True, blank=True)
@@ -74,7 +74,7 @@ class UserModel(AbstractUser):
         verbose_name_plural = "users"
 
     def __str__(self):
-        return self.username
+        return f"ID{self.id} {self.username}"
 
 
 # Sms kode

@@ -14,6 +14,9 @@ class Message(models.Model):
     file_message = models.ForeignKey('FileMessage', null=True, blank=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.owner}: {self.text} ({self.file_message})"
+
 
 class FileMessage(models.Model):
     image = models.ImageField(upload_to=f'message/images/{today.year}-{today.month}-{today.month}/',
@@ -23,6 +26,10 @@ class FileMessage(models.Model):
                             null=True, blank=True)
     size = models.CharField(max_length=50, null=True, blank=True)
     video = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"ID{self.id} message file: {self.file} ({self.size})"
+
 
 class ChatRoom(models.Model):
     admin = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='chat_admin', null=True, blank=True)
@@ -40,3 +47,6 @@ class ChatRoom(models.Model):
 
     def get_client_fullname(self):
         return self.client.get_full_name()
+
+    def __str__(self):
+        return f"{self.admin}'s, {self.doktor}'s and {self.client}'s chat with ID{self.id}"

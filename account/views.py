@@ -385,7 +385,7 @@ class DeliverAddressView(generics.ListAPIView, APIView):
         },
     )
     def post(self, request):
-        region = RegionModel.objects.get(id=request.data["region"])
+        region = RegionModel.objects.get(id=request.data["region"]['id'])
         serializers = DeliverAddressSerializer(data=request.data)
         del request.data["region"]
         if serializers.is_valid():
@@ -414,7 +414,7 @@ class DeliverAddressView(generics.ListAPIView, APIView):
         key = request.GET.get('pk', False)
         add = DeliveryAddress.objects.get(id=key)
         try:
-            region = RegionModel.objects.get(id=request.data["region"])
+            region = RegionModel.objects.get(id=request.data["region"]['id'])
             add.region = region
         except:
             pass

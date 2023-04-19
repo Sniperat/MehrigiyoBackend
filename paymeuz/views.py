@@ -29,7 +29,7 @@ class CardView(APIView):
         },
     )
     def get(self, request):
-        card = Card.objects.filter(owner=request.user)
+        card = Card.objects.filter(owner=request.user, is_deleted=False)
         serializer = CardSerializer(card, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
@@ -109,7 +109,8 @@ class CardView(APIView):
         card = Card.objects.get(id=request.data['card_id'])
         data = cards_remove(card.token)
         if data:
-            card.delete()
+            card.is_deleted = True
+            card.save()
             return ResponseSuccess(data=data)
         else:
             return ResponseFail()

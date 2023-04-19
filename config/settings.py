@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_filters',
+    'admin_auto_filters',
 
     'corsheaders',
 

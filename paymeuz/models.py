@@ -29,8 +29,9 @@ class PaymeTransactionModel(models.Model):
 
 class Card(models.Model):
     owner = models.ForeignKey(UserModel, on_delete=models.RESTRICT)
-    number = models.CharField(max_length=16, unique=True)
+    number = models.CharField(max_length=16)
     expire = models.CharField(max_length=5)
     token = models.TextField()
     recurrent = models.BooleanField()
     verify = models.BooleanField()
+    is_deleted = models.BooleanField(default=False)
