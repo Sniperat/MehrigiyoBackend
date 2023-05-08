@@ -24,6 +24,9 @@ class Doctor(models.Model):
     type_doctor = models.ForeignKey(TypeDoctor, on_delete=models.RESTRICT, null=True)
     created_at = models.DateTimeField(auto_now=True, null=True)
 
+    def __str__(self):
+        return self.full_name
+
 
 FEEDBACK = (
     (1, 'Not Bad'),
@@ -40,6 +43,9 @@ class RateDoctor(models.Model):
     feedback = models.SmallIntegerField(default=1, choices=FEEDBACK)
     created_at = models.DateTimeField(auto_now=True, null=True)
 
+    def __str__(self):
+        return f"{self.client}'s rate for {self.doctor} is {self.rate}"
+
 
 class AdviceTime(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT)
@@ -48,9 +54,15 @@ class AdviceTime(models.Model):
     end_time = models.DateTimeField()
     status = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f"{self.doctor}'s advice time for {self.client} from {self.start_time} to {self.end_time}"
+
 
 class Advertising(models.Model):
     image = models.ImageField(upload_to=f'doctor/advertising/', null=True, blank=True)
     title = models.CharField(max_length=255)
     text = models.TextField()
     doctor = models.ForeignKey(Doctor, on_delete=models.RESTRICT, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.doctor}'s advertisement: {self.title} ({self.text})"

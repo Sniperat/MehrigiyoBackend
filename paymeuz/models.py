@@ -20,7 +20,7 @@ class PaymeTransactionModel(models.Model):
     cancel_reason = models.IntegerField(null=True, blank=True, verbose_name=_('cancel reason'))
 
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.phone}'s ID{self.id} payment"
 
     class Meta:
         verbose_name = _('payme transaction')
@@ -35,3 +35,6 @@ class Card(models.Model):
     recurrent = models.BooleanField()
     verify = models.BooleanField()
     is_deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.owner}'s card {self.number} {self.expire}"

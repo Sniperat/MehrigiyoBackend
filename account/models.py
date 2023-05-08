@@ -88,12 +88,18 @@ class SmsCode(models.Model):
     class Meta:
         index_together = []
 
+    def __str__(self):
+        return f"{self.phone}: {self.code} ({self.expire_at})"
+
 
 # Sms try
 class SmsAttempt(models.Model):
     phone = models.CharField(max_length=16, db_index=True)
     counter = models.IntegerField(default=0)
     last_attempt_at = models.DateTimeField(db_index=True)
+
+    def __str__(self):
+        return f"{self.phone}: {self.counter} pcs. attempts"
 
 
 class CountyModel(models.Model):
@@ -122,9 +128,15 @@ class DeliveryAddress(models.Model):
     door_or_phone = models.CharField(max_length=255, null=True, blank=True)
     instructions = models.CharField(max_length=255, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.user}'s delivery address: {self.region}, {self.full_address}, {self.apartment_office} {self.floor} floor, {self.door_or_phone}"
+
 
 class OfferModel(models.Model):
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
     offer = models.TextField()
+
+    def __str__(self):
+        return f"{self.name} offer for {self.phone_number} ({self.email})"
