@@ -2,7 +2,7 @@ from admin_auto_filters.filters import AutocompleteFilter
 
 from django.contrib import admin
 from modeltranslation.admin import TabbedTranslationAdmin
-from .models import Medicine, TypeMedicine, OrderModel, CartModel, PicturesMedicine
+from .models import Medicine, TypeMedicine, OrderModel, CartModel, PicturesMedicine, DeliveryMan
 
 
 class TypeMedicineFilter(AutocompleteFilter):
@@ -65,6 +65,7 @@ class DeliveryManAdmin(admin.ModelAdmin):
     list_display = ['id', 'full_name', 'phone', ]
     search_fields = ['id', 'full_name', 'phone', ]
 
+admin.site.register(DeliveryMan, DeliveryManAdmin)
 
 class OrderModelAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'

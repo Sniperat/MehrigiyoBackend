@@ -1,9 +1,13 @@
 from modeltranslation.translator import translator, TranslationOptions
-from .models import NewsModel, TagsModel
+from .models import NewsModel, TagsModel, Advertising
 
 
 class NewsTranslation(TranslationOptions):
     fields = ('name', 'description',)
+
+
+class AdvertisingTranslation(TranslationOptions):
+    fields = ('title', 'text',)
 
 
 class TagsTranslation(TranslationOptions):
@@ -11,4 +15,5 @@ class TagsTranslation(TranslationOptions):
 
 
 translator.register(NewsModel, NewsTranslation)
+translator.register(Advertising, AdvertisingTranslation)
 translator.register(TagsModel, TagsTranslation)

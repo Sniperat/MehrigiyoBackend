@@ -96,6 +96,21 @@ class DoctorsView(generics.ListAPIView):
         return context
 
 
+class DoctorRetrieveView(generics.RetrieveAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
+    @swagger_auto_schema(
+        operation_id='doctor-detail',
+        operation_description="retrieving the doctor",
+        responses={
+            '200': DoctorSerializer()
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
 class GetDoctorsWithType(generics.ListAPIView):
     queryset = Doctor.objects.all()
     # permission_classes = (IsAuthenticated,)

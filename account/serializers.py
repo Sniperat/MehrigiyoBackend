@@ -93,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class DeliverAddressSerializer(serializers.ModelSerializer):
-    region = RegionSerializer()
+    region = RegionSerializer(required=False)
 
     class Meta:
         model = DeliveryAddress

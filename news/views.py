@@ -23,11 +23,10 @@ class NewsView(generics.ListAPIView):
     filterset_class = NewsFilter
 
     @swagger_auto_schema(
-        operation_id='advertising',
-        operation_description="advertisingView",
-        # request_body=AdvertisingSerializer(),
+        operation_id='news-list',
+        operation_description="getting list of news",
         responses={
-            '200': NewsModelSerializer()
+            '200': NewsModelSerializer(many=True)
         },
         manual_parameters=[
             openapi.Parameter('tag_id', openapi.IN_QUERY, description="test manual params",
@@ -40,13 +39,21 @@ class NewsView(generics.ListAPIView):
             keys = key.split(',')
             self.queryset = NewsModel.objects.filter(hashtag_id__id__in=keys)
         return self.list(request, *args, **kwargs)
-    # def get(self, request):
-    #     filtered_qs = self.filterset_class(request.GET, queryset=self.get_queryset()).qs
-    #
-    #     page = self.paginate_queryset(filtered_qs)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return ResponseSuccess(data=self.get_paginated_response(serializer.data), request=request.method)
+
+
+class NewsRetrieveView(generics.RetrieveAPIView):
+    queryset = NewsModel.objects.all()
+    serializer_class = NewsModelSerializer
+
+    @swagger_auto_schema(
+        operation_id='news-detail',
+        operation_description="retrieving the news",
+        responses={
+            '200': NewsModelSerializer()
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class TagView(APIView):
